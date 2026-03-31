@@ -63,33 +63,38 @@ h1{font-size:1.5rem;font-weight:700}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.75rem;font-weight:600;color:#fff}
 .task-heading{margin:18px 0 10px;color:#2c3e50;font-size:1rem;font-weight:700;padding:6px 12px;background:#eaf0fb;border-radius:6px;border-right:4px solid #3498db}
 
-/* ── STUDENT CARDS (Tab 2) ── */
+/* ── STUDENT CARDS ── */
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
 .card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 2px 6px rgba(0,0,0,.08);border-top:4px solid #3498db}
-.card-student-name{font-weight:700;font-size:1rem;margin-bottom:12px;color:#2c3e50;border-bottom:1px solid #eee;padding-bottom:8px}
-.card-task-block{margin-bottom:10px;padding:10px;background:#f8f9fb;border-radius:8px;border-right:3px solid #bbb}
+.card-student-name{font-weight:700;font-size:1rem;color:#2c3e50;margin-bottom:4px}
+.card-parents{font-size:.78rem;color:#666;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #eee;line-height:1.7}
+.card-parents a{color:#3498db;text-decoration:none}
+.card-parents a:hover{text-decoration:underline}
+.card-task-block{margin-bottom:8px;padding:10px;background:#f8f9fb;border-radius:8px;border-right:3px solid #bbb}
 .card-task-block.done{border-right-color:#3498db}
-.card-task-name{font-size:.82rem;font-weight:700;color:#555;margin-bottom:6px}
+.card-task-name{font-size:.82rem;font-weight:700;color:#555;margin-bottom:5px}
 .card-task-avg{font-size:1.1rem;font-weight:700}
-.card-avg-basis{font-size:.7rem;color:#888;margin-bottom:6px}
+.card-avg-basis{font-size:.7rem;color:#888;margin-bottom:5px}
 .card-level-row{display:flex;justify-content:space-between;font-size:.78rem;padding:2px 0;color:#555}
 .card-level-name{font-weight:600}
 .notstarted-text{color:#aaa;font-style:italic;font-size:.85rem}
 
-/* ── ALERT REPORT (Tab 3) ── */
-.alert-task-section{margin-bottom:28px;border:1px solid #e0e0e0;border-radius:10px;overflow:hidden}
+/* ── ALERT REPORT ── */
+.alert-task-section{margin-bottom:24px;border:1px solid #e0e0e0;border-radius:10px;overflow:hidden}
 .alert-task-title{background:#2c3e50;color:#fff;padding:10px 16px;font-weight:700;font-size:.95rem}
 .alert-sub{padding:14px 16px;border-bottom:1px solid #f0f0f0}
 .alert-sub:last-child{border-bottom:none}
-.alert-sub-title{font-weight:700;font-size:.88rem;margin-bottom:10px;padding:4px 10px;border-radius:6px;display:inline-block;color:#fff}
+.alert-sub-title{font-weight:700;font-size:.85rem;margin-bottom:10px;padding:4px 10px;border-radius:6px;display:inline-block;color:#fff}
 .alert-sub-title.notdone{background:#7f8c8d}
 .alert-sub-title.struggle{background:#e67e22}
 .alert-sub-title.far{background:#e74c3c}
 .alert-table{width:100%;border-collapse:collapse;font-size:.82rem}
-.alert-table th{background:#f0f0f0;padding:7px 10px;text-align:right;font-weight:600;color:#555;font-size:.78rem}
+.alert-table th{background:#f4f4f4;padding:7px 10px;text-align:right;font-weight:600;color:#555;font-size:.78rem;border-bottom:1px solid #e0e0e0}
 .alert-table td{padding:7px 10px;border-bottom:1px solid #f5f5f5;text-align:right;vertical-align:middle}
 .alert-table tr:last-child td{border-bottom:none}
 .alert-table tr:hover td{background:#fafafa}
+.alert-table a{color:#3498db;text-decoration:none;font-size:.8rem}
+.alert-table a:hover{text-decoration:underline}
 .alert-empty{color:#aaa;font-style:italic;font-size:.85rem;padding:6px 0}
 
 @media print{
@@ -106,7 +111,6 @@ h1{font-size:1.5rem;font-weight:700}
 <!-- ══════════ UPLOAD ══════════ -->
 <div id="uploadScreen">
   <h1>📊 דוח ביצועים כיתתי</h1>
-
   <div class="upload-section">
     <h2>קבצי דוח (אחד או יותר)</h2>
     <div class="dropzone" id="dzReports" onclick="document.getElementById('inReports').click()">
@@ -115,7 +119,6 @@ h1{font-size:1.5rem;font-weight:700}
     <input type="file" id="inReports" accept=".xlsx,.xls" multiple style="display:none">
     <div class="file-list" id="listReports"></div>
   </div>
-
   <div class="upload-section">
     <h2>קובץ רשימת כיתה</h2>
     <div class="dropzone" id="dzClass" onclick="document.getElementById('inClass').click()">
@@ -124,7 +127,6 @@ h1{font-size:1.5rem;font-weight:700}
     <input type="file" id="inClass" accept=".xlsx,.xls" style="display:none">
     <div class="file-list" id="listClass"></div>
   </div>
-
   <button id="generateBtn" onclick="generateReport()" disabled>צור דוח</button>
   <div id="uploadErr"></div>
 </div>
@@ -132,7 +134,7 @@ h1{font-size:1.5rem;font-weight:700}
 <!-- ══════════ REPORT ══════════ -->
 <div id="reportScreen">
   <div class="rpt-header">
-    <h1>📊 דוח ביצועים כיתתי</h1>
+    <h1 id="reportTitle">📊 דוח ביצועים כיתתי</h1>
     <div class="hdr-btns">
       <button class="print-btn" onclick="window.print()">🖨️ הדפסה</button>
       <button class="back-btn" onclick="goBack()">← חזרה</button>
@@ -164,491 +166,464 @@ h1{font-size:1.5rem;font-weight:700}
 </div>
 
 <script>
-// ══════════════════════════════ STATE ══════════════════════════════
-let roster     = [];
-// roster item: {firstName, lastName, fullName, gender, parentName, email1, email2}
-let tasks      = {};
-// tasks[taskName] = {totalQ, questions:[{num,level}], students:{reportKey: scores[]}, hasLevels}
+// ══════════════════════ STATE ══════════════════════
+let roster    = [];
+// {firstName, lastName, fullName, gender,
+//  parent1Name, parent2Name, email1, email2,
+//  teacher, classLetter}
+let tasks     = {};
+// {taskName: {totalQ, questions:[{num,level}], students:{key:scores[]}, hasLevels}}
 let classFile  = null;
 let reportFiles= [];
 let activeTask = null;
+let reportTitle= '';
 
-// ══════════════════════════════ CONSTANTS ══════════════════════════════
-const SCORE_LABELS = {excellent:'מצוין',good:'טוב מאוד',basic:'טוב',struggle:'מתקשה',far:'רחוק מהיעד',notdone:'לא פתר/לא פתרה'};
-const SCORE_COLORS = {excellent:'#27ae60',good:'#2980b9',basic:'#16a085',struggle:'#e67e22',far:'#e74c3c',notdone:'#95a5a6'};
-const Q_LEVELS     = ['הבנה בסיסית','שאלה מילולית','תובנה גבוהה'];
+// ══════════════════════ CONSTANTS ══════════════════════
+const SCORE_LABELS={excellent:'מצוין',good:'טוב מאוד',basic:'טוב',struggle:'מתקשה',far:'רחוק מהיעד',notdone:'לא פתר/לא פתרה'};
+const SCORE_COLORS={excellent:'#27ae60',good:'#2980b9',basic:'#16a085',struggle:'#e67e22',far:'#e74c3c',notdone:'#95a5a6'};
+const Q_LEVELS=['הבנה בסיסית','שאלה מילולית','תובנה גבוהה'];
 
-// ══════════════════════════════ UTILS ══════════════════════════════
-const norm   = s => String(s ?? '').trim().replace(/\s+/g,' ');
+// ══════════════════════ UTILS ══════════════════════
+const norm   = s => String(s??'').trim().replace(/\s+/g,' ');
 const normLC = s => norm(s).toLowerCase();
 const esc    = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const escRe  = s => s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 
-function getScoreLevel(score) {
-  if (score === null || score === undefined) return null;
-  const n = +score;
-  if (isNaN(n)) return null;
-  if (n === 0)  return 'notdone';
-  if (n >= 90)  return 'excellent';
-  if (n >= 75)  return 'good';
-  if (n >= 60)  return 'basic';
-  if (n >= 40)  return 'struggle';
+function getScoreLevel(score){
+  if(score===null||score===undefined) return null;
+  const n=+score; if(isNaN(n)) return null;
+  if(n===0)  return 'notdone';
+  if(n>=90)  return 'excellent';
+  if(n>=75)  return 'good';
+  if(n>=60)  return 'basic';
+  if(n>=40)  return 'struggle';
   return 'far';
 }
-
-function badge(level) {
-  return level ? `<span class="badge lbadge lb-${level}">${SCORE_LABELS[level]}</span>` : '';
+function badge(level){
+  return level?`<span class="badge lbadge lb-${level}">${SCORE_LABELS[level]}</span>`:'';
 }
 
-// ══════════════════════════════ DROP ZONES ══════════════════════════════
-function setupDrop(dzId, inputId, onFiles) {
-  const dz = document.getElementById(dzId), inp = document.getElementById(inputId);
-  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dragover'); });
-  dz.addEventListener('dragleave', ()  => dz.classList.remove('dragover'));
-  dz.addEventListener('drop', e => {
-    e.preventDefault(); dz.classList.remove('dragover');
-    onFiles([...e.dataTransfer.files].filter(f => /\.xlsx?$/i.test(f.name)));
+// ══════════════════════ DROP ZONES ══════════════════════
+function setupDrop(dzId,inputId,onFiles){
+  const dz=document.getElementById(dzId), inp=document.getElementById(inputId);
+  dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('dragover');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+  dz.addEventListener('drop',e=>{
+    e.preventDefault();dz.classList.remove('dragover');
+    onFiles([...e.dataTransfer.files].filter(f=>/\.xlsx?$/i.test(f.name)));
   });
-  inp.addEventListener('change', () => { onFiles([...inp.files]); inp.value = ''; });
+  inp.addEventListener('change',()=>{onFiles([...inp.files]);inp.value='';});
 }
-
-setupDrop('dzReports','inReports', files => {
-  reportFiles = [...reportFiles, ...files]; renderReportList(); ready();
-});
-setupDrop('dzClass','inClass', files => {
-  if (!files.length) return;
-  classFile = files[0];
-  document.getElementById('listClass').innerHTML =
+setupDrop('dzReports','inReports',files=>{reportFiles=[...reportFiles,...files];renderReportList();ready();});
+setupDrop('dzClass','inClass',files=>{
+  if(!files.length) return;
+  classFile=files[0];
+  document.getElementById('listClass').innerHTML=
     `<div class="file-item">📄 ${esc(classFile.name)} <span class="rm" onclick="removeClass(event)">×</span></div>`;
   ready();
 });
-
-function removeClass(e) { e.stopPropagation(); classFile = null; document.getElementById('listClass').innerHTML = ''; ready(); }
-function removeReport(e, i) { e.stopPropagation(); reportFiles.splice(i,1); renderReportList(); ready(); }
-function renderReportList() {
-  document.getElementById('listReports').innerHTML =
-    reportFiles.map((f,i) => `<div class="file-item">📊 ${esc(f.name)} <span class="rm" onclick="removeReport(event,${i})">×</span></div>`).join('');
+function removeClass(e){e.stopPropagation();classFile=null;document.getElementById('listClass').innerHTML='';ready();}
+function removeReport(e,i){e.stopPropagation();reportFiles.splice(i,1);renderReportList();ready();}
+function renderReportList(){
+  document.getElementById('listReports').innerHTML=
+    reportFiles.map((f,i)=>`<div class="file-item">📊 ${esc(f.name)} <span class="rm" onclick="removeReport(event,${i})">×</span></div>`).join('');
 }
-function ready() { document.getElementById('generateBtn').disabled = !(classFile && reportFiles.length); }
-function goBack() { document.getElementById('reportScreen').style.display='none'; document.getElementById('uploadScreen').style.display='block'; }
+function ready(){document.getElementById('generateBtn').disabled=!(classFile&&reportFiles.length);}
+function goBack(){document.getElementById('reportScreen').style.display='none';document.getElementById('uploadScreen').style.display='block';}
 
-// ══════════════════════════════ EXCEL HELPER ══════════════════════════════
-function readWb(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = e => { try { res(XLSX.read(e.target.result, {type:'array'})); } catch(err) { rej(err); } };
-    r.onerror = rej; r.readAsArrayBuffer(file);
+// ══════════════════════ EXCEL HELPER ══════════════════════
+function readWb(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>{try{res(XLSX.read(e.target.result,{type:'array'}));}catch(err){rej(err);}};
+    r.onerror=rej; r.readAsArrayBuffer(file);
   });
 }
 
-// ══════════════════════════════ PARSE ROSTER ══════════════════════════════
-function parseRoster(wb) {
-  const ws   = wb.Sheets[wb.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:null});
-  const hdr  = rows[2]; // row index 2 = row 3
-  if (!hdr) return [];
+// ══════════════════════ PARSE ROSTER ══════════════════════
+function parseRoster(wb){
+  const ws  =wb.Sheets[wb.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+  const hdr =rows[2]; if(!hdr) return [];
 
-  let firstCol=-1, lastCol=-1, genderCol=-1, parentCol=-1, email1Col=-1, email2Col=-1;
-  for (let j = 0; j < hdr.length; j++) {
-    const h = norm(hdr[j]);
-    if (h === 'שם'           && firstCol  < 0) firstCol  = j;
-    if (h === 'שם משפחה'     && lastCol   < 0) lastCol   = j;
-    if (h === 'מין'           && genderCol < 0) genderCol = j;
-    if (h === 'שם הורה'       && parentCol < 0) parentCol = j;
-    if (h === 'דוא"ל אפוטרופוס 1' && email1Col < 0) email1Col = j;
-    if (h === 'דוא"ל אפוטרופוס 2' && email2Col < 0) email2Col = j;
+  // find column indices — "שם הורה" may appear twice
+  let firstCol=-1,lastCol=-1,genderCol=-1;
+  let parent1Col=-1,parent2Col=-1,email1Col=-1,email2Col=-1;
+  let teacherCol=-1,classLetterCol=-1;
+
+  for(let j=0;j<hdr.length;j++){
+    const h=norm(hdr[j]);
+    if(h==='שם'                    && firstCol<0)       firstCol=j;
+    if(h==='שם משפחה'              && lastCol<0)        lastCol=j;
+    if(h==='מין'                   && genderCol<0)      genderCol=j;
+    if(h==='שם הורה'               && parent1Col<0)     parent1Col=j;
+    else if(h==='שם הורה'          && parent2Col<0)     parent2Col=j;
+    if(h==='דוא"ל אפוטרופוס 1'    && email1Col<0)      email1Col=j;
+    if(h==='דוא"ל אפוטרופוס 2'    && email2Col<0)      email2Col=j;
+    if(h==='חונך/כת'               && teacherCol<0)     teacherCol=j;
+    if(h==='כיתת אם'               && classLetterCol<0) classLetterCol=j;
   }
 
-  const out = [];
-  for (let i = 3; i < rows.length; i++) {
-    const row = rows[i]; if (!row) continue;
-    const first  = firstCol  >= 0 ? norm(row[firstCol])  : '';
-    const last   = lastCol   >= 0 ? norm(row[lastCol])   : '';
-    if (!first && !last) continue;
-    const fullName   = (first + ' ' + last).trim();
-    const genRaw     = genderCol >= 0 ? norm(row[genderCol]) : '';
-    const gender     = genRaw.includes('נקבה') ? 'נקבה' : 'זכר';
-    const parentName = parentCol  >= 0 ? norm(row[parentCol])  : '';
-    const email1     = email1Col  >= 0 ? norm(row[email1Col])  : '';
-    const email2     = email2Col  >= 0 ? norm(row[email2Col])  : '';
-    out.push({firstName:first, lastName:last, fullName, gender, parentName, email1, email2});
+  const out=[];
+  let classLetter='', teacher='';
+
+  for(let i=3;i<rows.length;i++){
+    const row=rows[i]; if(!row) continue;
+    const first=firstCol>=0?norm(row[firstCol]):'';
+    const last =lastCol >=0?norm(row[lastCol]) :'';
+    if(!first&&!last) continue;
+
+    const fullName    =(first+' '+last).trim();
+    const genRaw      =genderCol>=0?norm(row[genderCol]):'';
+    const gender      =genRaw.includes('נקבה')?'נקבה':'זכר';
+    const parent1Name =parent1Col>=0?norm(row[parent1Col]):'';
+    const parent2Name =parent2Col>=0?norm(row[parent2Col]):'';
+    const email1      =email1Col >=0?norm(row[email1Col]) :'';
+    const email2      =email2Col >=0?norm(row[email2Col]) :'';
+    const tch         =teacherCol>=0?norm(row[teacherCol]):'';
+    const cls         =classLetterCol>=0?norm(row[classLetterCol]):'';
+
+    if(!classLetter && cls) classLetter=cls;
+    if(!teacher     && tch) teacher=tch;
+
+    out.push({firstName:first,lastName:last,fullName,gender,
+              parent1Name,parent2Name,email1,email2,teacher:tch,classLetter:cls});
   }
+
+  // Store globally for title
+  reportTitle = (classLetter||teacher)
+    ? 'ביצועי כיתה' + (classLetter?' '+classLetter:'') + (teacher?' '+teacher:'')
+    : 'דוח ביצועים כיתתי';
+
   return out;
 }
 
-// ══════════════════════════════ NAME MATCHING ══════════════════════════════
-function findRosterStudent(reportName) {
-  const rn = normLC(reportName);
-
+// ══════════════════════ NAME MATCHING ══════════════════════
+function findRosterStudent(reportName){
+  const rn=normLC(reportName);
   // Step 1: all words of lastName + firstName
-  for (const s of roster) {
-    const lastWords = normLC(s.lastName).split(' ').filter(Boolean);
-    const first     = normLC(s.firstName);
-    if (!lastWords.length) continue;
-    const allLast = lastWords.every(w => new RegExp('(?:^|\\s)' + escRe(w) + '(?:\\s|$)').test(rn));
-    if (allLast && first && new RegExp('(?:^|\\s)' + escRe(first) + '(?:\\s|$)').test(rn)) return s;
+  for(const s of roster){
+    const lw=normLC(s.lastName).split(' ').filter(Boolean);
+    const fn=normLC(s.firstName);
+    if(!lw.length) continue;
+    const allL=lw.every(w=>new RegExp('(?:^|\\s)'+escRe(w)+'(?:\\s|$)').test(rn));
+    if(allL&&fn&&new RegExp('(?:^|\\s)'+escRe(fn)+'(?:\\s|$)').test(rn)) return s;
   }
-  // Step 2: all words of lastName only
-  for (const s of roster) {
-    const lastWords = normLC(s.lastName).split(' ').filter(Boolean);
-    if (!lastWords.length) continue;
-    const allLast = lastWords.every(w => new RegExp('(?:^|\\s)' + escRe(w) + '(?:\\s|$)').test(rn));
-    if (allLast) return s;
+  // Step 2: last name only
+  for(const s of roster){
+    const lw=normLC(s.lastName).split(' ').filter(Boolean);
+    if(!lw.length) continue;
+    if(lw.every(w=>new RegExp('(?:^|\\s)'+escRe(w)+'(?:\\s|$)').test(rn))) return s;
   }
   return null;
 }
 
-function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
-
-// ══════════════════════════════ PARSE TYPE A ══════════════════════════════
-function parseTypeA(ws) {
-  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:null});
-
-  // Task name: row 0
-  let taskName = '';
-  const row0 = rows[0] || [];
-  for (let j = 0; j < row0.length; j++) {
-    const c = norm(row0[j]);
-    if (c.includes('שם המשימה')) {
-      const after = c.replace(/שם המשימה\s*:?\s*/,'').trim();
-      if (after) { taskName = after; break; }
-      for (let k = j+1; k < row0.length; k++) { const v=norm(row0[k]); if(v){taskName=v;break;} }
+// ══════════════════════ PARSE TYPE A ══════════════════════
+function parseTypeA(ws){
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+  let taskName='';
+  const row0=rows[0]||[];
+  for(let j=0;j<row0.length;j++){
+    const c=norm(row0[j]);
+    if(c.includes('שם המשימה')){
+      const after=c.replace(/שם המשימה\s*:?\s*/,'').trim();
+      if(after){taskName=after;break;}
+      for(let k=j+1;k<row0.length;k++){const v=norm(row0[k]);if(v){taskName=v;break;}}
       break;
     }
   }
-
-  const hdrRow   = rows[7] || [];
-  const levelRow = rows[8] || [];
-  const qCols    = [];
-
-  for (let j = 7; j < hdrRow.length; j++) {
-    const m = norm(hdrRow[j]).match(/^שאלה\s*(\d+)$/);
-    if (!m) continue;
-    const num   = parseInt(m[1]);
-    const lvRaw = norm(levelRow[j]);
-    const level = Q_LEVELS.includes(lvRaw) ? lvRaw : 'הבנה בסיסית';
-    qCols.push({idx:j, num, level});
+  const hdrRow  =rows[7]||[];
+  const levelRow=rows[8]||[];
+  const qCols=[];
+  for(let j=7;j<hdrRow.length;j++){
+    const m=norm(hdrRow[j]).match(/^שאלה\s*(\d+)$/);
+    if(!m) continue;
+    const num  =parseInt(m[1]);
+    const lvRaw=norm(levelRow[j]);
+    qCols.push({idx:j,num,level:Q_LEVELS.includes(lvRaw)?lvRaw:'הבנה בסיסית'});
   }
-
-  const totalQ    = qCols.length ? Math.max(...qCols.map(q=>q.num)) : 0;
-  const questions = qCols.map(q => ({num:q.num, level:q.level}));
-  const hasLevels = questions.some(q => q.level !== 'הבנה בסיסית');
-  const SKIP      = ['ממוצע','סה"כ','סהכ','כיתה'];
-  const students  = {};
-
-  for (let i = 10; i < rows.length; i++) {
-    const row = rows[i]; if (!row) continue;
-    const rawName = norm(row[0]);
-    if (!rawName) continue;
-    if (SKIP.some(w => rawName.includes(w))) continue;
-    const status = norm(row[2]);
-
-    if (status === 'טרם הותחלה') {
-      const arr = new Array(totalQ).fill(null);
-      arr._notStarted = true;
-      students[rawName] = arr;
-      continue;
+  const totalQ   =qCols.length?Math.max(...qCols.map(q=>q.num)):0;
+  const questions=qCols.map(q=>({num:q.num,level:q.level}));
+  const hasLevels=questions.some(q=>q.level!=='הבנה בסיסית');
+  const SKIP=['ממוצע','סה"כ','סהכ','כיתה'];
+  const students={};
+  for(let i=10;i<rows.length;i++){
+    const row=rows[i]; if(!row) continue;
+    const rawName=norm(row[0]); if(!rawName) continue;
+    if(SKIP.some(w=>rawName.includes(w))) continue;
+    const status=norm(row[2]);
+    if(status==='טרם הותחלה'){
+      const arr=new Array(totalQ).fill(null); arr._notStarted=true; students[rawName]=arr; continue;
     }
-
-    const scores = new Array(totalQ).fill(null);
-    for (const {idx,num} of qCols) {
-      if (num < 1 || num > totalQ) continue;
-      const val = row[idx];
-      const s   = String(val ?? '').trim();
-      if (s===''||s==='-'||val===null||val===undefined) { scores[num-1]=null; continue; }
-      const n = +val;
-      scores[num-1] = isNaN(n) ? null : n;
+    const scores=new Array(totalQ).fill(null);
+    for(const{idx,num}of qCols){
+      if(num<1||num>totalQ) continue;
+      const val=row[idx], s=String(val??'').trim();
+      if(s===''||s==='-'||val===null||val===undefined){scores[num-1]=null;continue;}
+      const n=+val; scores[num-1]=isNaN(n)?null:n;
     }
-    students[rawName] = scores;
+    students[rawName]=scores;
   }
-
-  return {taskName: taskName||'משימה', totalQ, questions, students, hasLevels};
+  return{taskName:taskName||'משימה',totalQ,questions,students,hasLevels};
 }
 
-// ══════════════════════════════ PARSE TYPE B ══════════════════════════════
-function parseTypeB(ws, fileName) {
-  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:null});
-  if (!rows.length) return null;
-
-  const hdr      = rows[0] || [];
-  const topicCols = [];
-  for (let j = 1; j < hdr.length; j++) {
-    const t = norm(hdr[j]); if (t) topicCols.push({idx:j, name:t});
-  }
-
-  const totalQ    = topicCols.length;
-  const questions = topicCols.map((_,i) => ({num:i+1, level:'הבנה בסיסית'}));
-  const SKIP      = ['ממוצע','סה"כ','סהכ'];
-  const students  = {};
-
-  for (let i = 2; i < rows.length; i++) {
-    const row = rows[i]; if (!row) continue;
-    const rawName = norm(row[0]);
-    if (!rawName) continue;
-    if (SKIP.some(w => rawName.includes(w))) continue;
-    const scores = new Array(totalQ).fill(null);
-    for (let k = 0; k < topicCols.length; k++) {
-      const val = row[topicCols[k].idx];
-      const s   = String(val ?? '').trim();
-      if (s===''||s==='-'||val===null||val===undefined) { scores[k]=null; continue; }
-      const n = +val;
-      scores[k] = isNaN(n) ? null : n;
+// ══════════════════════ PARSE TYPE B ══════════════════════
+function parseTypeB(ws,fileName){
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+  if(!rows.length) return null;
+  const hdr=rows[0]||[];
+  const topicCols=[];
+  for(let j=1;j<hdr.length;j++){const t=norm(hdr[j]);if(t) topicCols.push({idx:j,name:t});}
+  const totalQ=topicCols.length;
+  const questions=topicCols.map((_,i)=>({num:i+1,level:'הבנה בסיסית'}));
+  const SKIP=['ממוצע','סה"כ','סהכ'];
+  const students={};
+  for(let i=2;i<rows.length;i++){
+    const row=rows[i]; if(!row) continue;
+    const rawName=norm(row[0]); if(!rawName) continue;
+    if(SKIP.some(w=>rawName.includes(w))) continue;
+    const scores=new Array(totalQ).fill(null);
+    for(let k=0;k<topicCols.length;k++){
+      const val=row[topicCols[k].idx], s=String(val??'').trim();
+      if(s===''||s==='-'||val===null||val===undefined){scores[k]=null;continue;}
+      const n=+val; scores[k]=isNaN(n)?null:n;
     }
-    students[rawName] = scores;
+    students[rawName]=scores;
   }
-
-  return {taskName: fileName.replace(/\.xlsx?$/i,''), totalQ, questions, students, hasLevels:false};
+  return{taskName:fileName.replace(/\.xlsx?$/i,''),totalQ,questions,students,hasLevels:false};
 }
 
-// ══════════════════════════════ MERGE ══════════════════════════════
-function mergeTasks(a, b) {
-  const totalQ    = Math.max(a.totalQ, b.totalQ);
-  const qMap      = {};
-  for (const q of a.questions) qMap[q.num] = q;
-  for (const q of b.questions) qMap[q.num] = q;
-  const questions = Object.values(qMap).sort((x,y) => x.num-y.num);
-  const students  = {};
-
-  const pad = (sc, n) => { const a=[...sc]; while(a.length<n) a.push(null); return a; };
-  for (const [n,sc] of Object.entries(a.students)) students[n] = pad(sc, totalQ);
-  for (const [n,sc] of Object.entries(b.students)) {
-    if (!students[n]) { students[n] = pad(sc, totalQ); }
-    else {
-      const ex = students[n];
-      for (let i = 0; i < Math.max(ex.length, sc.length); i++) {
-        const av=ex[i]??null, bv=sc[i]??null;
-        ex[i] = av===null ? bv : bv===null ? av : Math.max(av,bv);
+// ══════════════════════ MERGE ══════════════════════
+function mergeTasks(a,b){
+  const totalQ=Math.max(a.totalQ,b.totalQ);
+  const qMap={};
+  for(const q of a.questions) qMap[q.num]=q;
+  for(const q of b.questions) qMap[q.num]=q;
+  const questions=Object.values(qMap).sort((x,y)=>x.num-y.num);
+  const students={};
+  const pad=(sc,n)=>{const a=[...sc];while(a.length<n)a.push(null);return a;};
+  for(const[n,sc]of Object.entries(a.students)) students[n]=pad(sc,totalQ);
+  for(const[n,sc]of Object.entries(b.students)){
+    if(!students[n]){students[n]=pad(sc,totalQ);}
+    else{
+      const ex=students[n];
+      for(let i=0;i<Math.max(ex.length,sc.length);i++){
+        const av=ex[i]??null,bv=sc[i]??null;
+        ex[i]=av===null?bv:bv===null?av:Math.max(av,bv);
       }
     }
   }
-  return {totalQ, questions, students, hasLevels: a.hasLevels||b.hasLevels};
+  return{totalQ,questions,students,hasLevels:a.hasLevels||b.hasLevels};
 }
 
-// ══════════════════════════════ COMPUTE STATS ══════════════════════════════
-function computeStats(scores, questions, totalQ) {
-  if (!scores) return null;
-  if (scores._notStarted) return {notStarted:true};
-
-  const answered = scores.filter(s => s !== null && s !== undefined);
-  const solved   = answered.filter(s => s > 0);
-  if (answered.length === 0 || answered.every(s => s === 0)) return {notStarted:true};
-
-  const avg = solved.length ? Math.round(solved.reduce((a,b)=>a+b,0)/solved.length) : null;
-  const bands = {excellent:0,good:0,basic:0,struggle:0,far:0,notdone:0};
-  for (const s of answered) { const lv=getScoreLevel(s); if(lv) bands[lv]++; }
-
-  const levelStats = {};
-  for (const ln of Q_LEVELS) {
-    const qNums   = questions.filter(q=>q.level===ln).map(q=>q.num);
-    if (!qNums.length) continue;
-    const lvSc    = qNums.map(n => scores[n-1]??null).filter(s => s!==null);
-    const lvSolved= lvSc.filter(s => s>0);
-    levelStats[ln]= {
-      avg:         lvSolved.length ? Math.round(lvSolved.reduce((a,b)=>a+b,0)/lvSolved.length) : null,
-      solvedCount: lvSolved.length,
-      noAnswer:    lvSc.length===0 || lvSc.every(s=>s===0)
+// ══════════════════════ STATS ══════════════════════
+function computeStats(scores,questions,totalQ){
+  if(!scores) return null;
+  if(scores._notStarted) return{notStarted:true};
+  const answered=scores.filter(s=>s!==null&&s!==undefined);
+  const solved  =answered.filter(s=>s>0);
+  if(answered.length===0||answered.every(s=>s===0)) return{notStarted:true};
+  const avg=solved.length?Math.round(solved.reduce((a,b)=>a+b,0)/solved.length):null;
+  const bands={excellent:0,good:0,basic:0,struggle:0,far:0,notdone:0};
+  for(const s of answered){const lv=getScoreLevel(s);if(lv) bands[lv]++;}
+  const levelStats={};
+  for(const ln of Q_LEVELS){
+    const qNums=questions.filter(q=>q.level===ln).map(q=>q.num);
+    if(!qNums.length) continue;
+    const lvSc  =qNums.map(n=>scores[n-1]??null).filter(s=>s!==null);
+    const lvSolv=lvSc.filter(s=>s>0);
+    levelStats[ln]={
+      avg:       lvSolv.length?Math.round(lvSolv.reduce((a,b)=>a+b,0)/lvSolv.length):null,
+      solvedCount:lvSolv.length,
+      noAnswer:  lvSc.length===0||lvSc.every(s=>s===0)
     };
   }
-
-  return {
-    notStarted: false, avg,
-    solvedCount: solved.length, totalQ,
-    answeredCount: answered.length,
-    bands, levelStats,
-    pct: totalQ>0 ? Math.round(answered.length/totalQ*100) : 0
-  };
+  return{notStarted:false,avg,solvedCount:solved.length,totalQ,
+         answeredCount:answered.length,bands,levelStats,
+         pct:totalQ>0?Math.round(answered.length/totalQ*100):0};
 }
 
-// ══════════════════════════════ GENERATE ══════════════════════════════
-async function generateReport() {
-  const btn=document.getElementById('generateBtn'), err=document.getElementById('uploadErr');
+// ══════════════════════ SCORE LOOKUP (cached) ══════════════════════
+const _scoreCache=new WeakMap();
+function buildCache(task){
+  if(_scoreCache.has(task)) return _scoreCache.get(task);
+  const map=new Map();
+  for(const[reportName,scores]of Object.entries(task.students)){
+    const s=findRosterStudent(reportName);
+    if(s&&!map.has(s)) map.set(s,scores);
+  }
+  _scoreCache.set(task,map); return map;
+}
+function getScores(task,student){return buildCache(task).get(student)??null;}
+
+// ══════════════════════ GENERATE ══════════════════════
+async function generateReport(){
+  const btn=document.getElementById('generateBtn'),err=document.getElementById('uploadErr');
   err.style.display='none'; btn.disabled=true; btn.textContent='מעבד...';
+  try{
+    roster=parseRoster(await readWb(classFile));
+    if(!roster.length) throw new Error('לא נמצאו תלמידים — ודאי שהכותרת בשורה 3 ומכילה "שם", "שם משפחה", "מין"');
 
-  try {
-    const rWb = await readWb(classFile);
-    roster = parseRoster(rWb);
-    if (!roster.length) throw new Error('לא נמצאו תלמידים בקובץ הכיתה — ודאי שהכותרת בשורה 3 ומכילה "שם", "שם משפחה", "מין"');
-
-    tasks = {};
-    for (const file of reportFiles) {
-      const wb     = await readWb(file);
-      const sheetA = wb.SheetNames.find(n => norm(n)==='ציון לפי שאלה');
-      const sheetB = wb.SheetNames.find(n => norm(n)==='Sheet1');
+    tasks={};
+    for(const file of reportFiles){
+      const wb    =await readWb(file);
+      const sheetA=wb.SheetNames.find(n=>norm(n)==='ציון לפי שאלה');
+      const sheetB=wb.SheetNames.find(n=>norm(n)==='Sheet1');
       let data;
-      if (sheetA)       data = parseTypeA(wb.Sheets[sheetA]);
-      else if (sheetB)  data = parseTypeB(wb.Sheets[sheetB], file.name);
-      else              data = parseTypeA(wb.Sheets[wb.SheetNames[0]]);
-      if (!data) continue;
-
-      const tn = data.taskName;
-      tasks[tn] = tasks[tn]
-        ? mergeTasks(tasks[tn], data)
-        : {totalQ:data.totalQ, questions:data.questions, students:data.students, hasLevels:data.hasLevels};
+      if(sheetA)      data=parseTypeA(wb.Sheets[sheetA]);
+      else if(sheetB) data=parseTypeB(wb.Sheets[sheetB],file.name);
+      else            data=parseTypeA(wb.Sheets[wb.SheetNames[0]]);
+      if(!data) continue;
+      const tn=data.taskName;
+      tasks[tn]=tasks[tn]?mergeTasks(tasks[tn],data):
+        {totalQ:data.totalQ,questions:data.questions,students:data.students,hasLevels:data.hasLevels};
     }
+    if(!Object.keys(tasks).length) throw new Error('לא נמצאו משימות בקבצי הדוח');
 
-    if (!Object.keys(tasks).length) throw new Error('לא נמצאו משימות בקבצי הדוח');
-
-    activeTask = null;
+    document.getElementById('reportTitle').textContent='📊 '+reportTitle;
+    activeTask=null;
     renderFilters(); renderAll();
-    document.getElementById('uploadScreen').style.display = 'none';
-    document.getElementById('reportScreen').style.display = 'block';
-
-  } catch(e) {
-    err.textContent = 'שגיאה: '+e.message; err.style.display='block'; console.error(e);
-  } finally {
+    document.getElementById('uploadScreen').style.display='none';
+    document.getElementById('reportScreen').style.display='block';
+  }catch(e){
+    err.textContent='שגיאה: '+e.message; err.style.display='block'; console.error(e);
+  }finally{
     btn.disabled=false; btn.textContent='צור דוח';
   }
 }
 
-// ══════════════════════════════ FILTERS / TABS ══════════════════════════════
-function renderFilters() {
-  let html = '<button class="filter-btn active" onclick="setFilter(null,this)">כל המשימות</button>';
-  for (const t of Object.keys(tasks))
-    html += `<button class="filter-btn" onclick="setFilter(${JSON.stringify(t)},this)">${esc(t)}</button>`;
-  document.getElementById('taskFilters').innerHTML = html;
+// ══════════════════════ FILTERS / TABS ══════════════════════
+function renderFilters(){
+  let html='<button class="filter-btn active" onclick="setFilter(null,this)">כל המשימות</button>';
+  for(const t of Object.keys(tasks))
+    html+=`<button class="filter-btn" onclick="setFilter(${JSON.stringify(t)},this)">${esc(t)}</button>`;
+  document.getElementById('taskFilters').innerHTML=html;
 }
-function setFilter(t, btn) {
+function setFilter(t,btn){
   activeTask=t;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active'); renderAll();
 }
-function getFiltered() { return activeTask ? [[activeTask,tasks[activeTask]]] : Object.entries(tasks); }
-function switchTab(id, btn) {
+function getFiltered(){return activeTask?[[activeTask,tasks[activeTask]]]:Object.entries(tasks);}
+function switchTab(id,btn){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active'); btn.classList.add('active');
 }
-function renderAll() { renderTab1(); renderTab2(); renderTab3(); }
+function renderAll(){renderTab1();renderTab2();renderTab3();}
 
-// ══════════════════════════════ SCORE LOOKUP ══════════════════════════════
-// Build a cache: for each task, map rosterStudent → scores[]
-const _scoreCache = new WeakMap();
-function buildCache(task) {
-  if (_scoreCache.has(task)) return _scoreCache.get(task);
-  const map = new Map();
-  for (const [reportName, scores] of Object.entries(task.students)) {
-    const s = findRosterStudent(reportName);
-    if (s && !map.has(s)) map.set(s, scores);
-  }
-  _scoreCache.set(task, map);
-  return map;
-}
-function getScores(task, rosterStudent) {
-  return buildCache(task).get(rosterStudent) ?? null;
-}
-
-// ══════════════════════════════ TAB 1 — DETAIL TABLE ══════════════════════════════
-function renderTab1() {
-  const filtered = getFiltered();
-  let html = '';
-
-  for (const [taskName, task] of filtered) {
-    const activeLevels = [...new Set(task.questions.map(q=>q.level))];
-    const showLevels   = task.hasLevels && activeLevels.length > 1;
-
-    html += `<div class="task-heading">${esc(taskName)}</div>`;
-    html += `<div class="tbl-wrap"><table class="rpt-table"><thead><tr>
+// ══════════════════════ TAB 1 — DETAIL TABLE ══════════════════════
+function renderTab1(){
+  const filtered=getFiltered(); let html='';
+  for(const[taskName,task]of filtered){
+    const activeLevels=[...new Set(task.questions.map(q=>q.level))];
+    const showLevels=task.hasLevels&&activeLevels.length>1;
+    html+=`<div class="task-heading">${esc(taskName)}</div>`;
+    html+=`<div class="tbl-wrap"><table class="rpt-table"><thead><tr>
       <th>שם תלמיד/ה</th><th>שאלות שנענו</th><th>% השלמה</th><th>ציון ממוצע</th>`;
-    if (showLevels) for (const ln of Q_LEVELS) if (activeLevels.includes(ln)) html+=`<th>${esc(ln)}</th>`;
-    html += `
-      <th style="background:#1e8449">מצוין<br>90–100</th>
-      <th style="background:#1a5276">טוב מאוד<br>75–89</th>
-      <th style="background:#117a65">טוב<br>60–74</th>
-      <th style="background:#935116">מתקשה<br>40–59</th>
-      <th style="background:#922b21">רחוק מהיעד<br>1–39</th>
-      <th style="background:#717d7e">לא פתר/ה<br>0</th>
+    if(showLevels) for(const ln of Q_LEVELS) if(activeLevels.includes(ln)) html+=`<th>${esc(ln)}</th>`;
+    html+=`<th style="background:#1e8449">מצוין<br>90–100</th>
+           <th style="background:#1a5276">טוב מאוד<br>75–89</th>
+           <th style="background:#117a65">טוב<br>60–74</th>
+           <th style="background:#935116">מתקשה<br>40–59</th>
+           <th style="background:#922b21">רחוק מהיעד<br>1–39</th>
+           <th style="background:#717d7e">לא פתר/ה<br>0</th>
     </tr></thead><tbody>`;
-
-    for (const student of roster) {
-      const scores = getScores(task, student);
-      const stats  = computeStats(scores, task.questions, task.totalQ);
-
-      if (!stats || stats.notStarted) {
-        const lbl  = student.gender==='נקבה' ? 'טרם עשתה' : 'טרם עשה';
-        const span = 3+(showLevels?activeLevels.filter(l=>Q_LEVELS.includes(l)).length:0)+6;
-        html += `<tr><td>${esc(student.fullName)}</td><td colspan="${span}" style="color:#aaa;font-style:italic">${lbl}</td></tr>`;
+    for(const student of roster){
+      const scores=getScores(task,student);
+      const stats =computeStats(scores,task.questions,task.totalQ);
+      if(!stats||stats.notStarted){
+        const lbl=student.gender==='נקבה'?'טרם עשתה':'טרם עשה';
+        const span=3+(showLevels?activeLevels.filter(l=>Q_LEVELS.includes(l)).length:0)+6;
+        html+=`<tr><td>${esc(student.fullName)}</td><td colspan="${span}" style="color:#aaa;font-style:italic">${lbl}</td></tr>`;
         continue;
       }
-
-      const lv = stats.avg !== null ? getScoreLevel(stats.avg) : null;
-      html += `<tr>
-        <td>${esc(student.fullName)}</td>
+      const lv=stats.avg!==null?getScoreLevel(stats.avg):null;
+      html+=`<tr><td>${esc(student.fullName)}</td>
         <td>${stats.answeredCount} / ${task.totalQ}</td>
         <td>${stats.pct}%</td>
         <td>${lv?`<span class="badge lbadge lb-${lv}">`:''} ${stats.avg??'—'} ${lv?'</span>':''}<br>
             <small style="color:#888">${stats.solvedCount}/${task.totalQ}</small></td>`;
-
-      if (showLevels) {
-        for (const ln of Q_LEVELS) {
-          if (!activeLevels.includes(ln)) continue;
-          const ls = stats.levelStats[ln];
-          if (!ls) { html += '<td>—</td>'; continue; }
-          if (ls.noAnswer) {
-            html += `<td style="color:#aaa">${student.gender==='נקבה'?'לא ענתה':'לא ענה'}</td>`;
-          } else {
-            const ll = ls.avg!==null ? getScoreLevel(ls.avg) : null;
-            html += `<td>${ll?`<span class="badge lbadge lb-${ll}">`:''} ${ls.avg??'—'} ${ll?'</span>':''}<br>
-                     <small style="color:#888">${ls.solvedCount} שאלות</small></td>`;
+      if(showLevels){
+        for(const ln of Q_LEVELS){
+          if(!activeLevels.includes(ln)) continue;
+          const ls=stats.levelStats[ln];
+          if(!ls){html+='<td>—</td>';continue;}
+          if(ls.noAnswer){html+=`<td style="color:#aaa">${student.gender==='נקבה'?'לא ענתה':'לא ענה'}</td>`;}
+          else{
+            const ll=ls.avg!==null?getScoreLevel(ls.avg):null;
+            html+=`<td>${ll?`<span class="badge lbadge lb-${ll}">`:''} ${ls.avg??'—'} ${ll?'</span>':''}<br>
+                   <small style="color:#888">${ls.solvedCount} שאלות</small></td>`;
           }
         }
       }
-
-      const b = stats.bands;
-      html += `<td>${b.excellent||'—'}</td><td>${b.good||'—'}</td><td>${b.basic||'—'}</td><td>${b.struggle||'—'}</td><td>${b.far||'—'}</td><td>${b.notdone||'—'}</td></tr>`;
+      const b=stats.bands;
+      html+=`<td>${b.excellent||'—'}</td><td>${b.good||'—'}</td><td>${b.basic||'—'}</td>
+             <td>${b.struggle||'—'}</td><td>${b.far||'—'}</td><td>${b.notdone||'—'}</td></tr>`;
     }
-    html += '</tbody></table></div>';
+    html+='</tbody></table></div>';
   }
-
-  document.getElementById('t1c').innerHTML = html || '<p style="color:#aaa;padding:20px">אין נתונים</p>';
+  document.getElementById('t1c').innerHTML=html||'<p style="color:#aaa;padding:20px">אין נתונים</p>';
 }
 
-// ══════════════════════════════ TAB 2 — STUDENT CARDS (one card per student, all tasks) ══════════════════════════════
-function renderTab2() {
-  const filteredTasks = getFiltered();
-  let html = '<div class="cards-grid">';
+// ══════════════════════ TAB 2 — STUDENT CARDS ══════════════════════
+function renderTab2(){
+  const filteredTasks=getFiltered(); let html='<div class="cards-grid">';
+  for(const student of roster){
+    const female=student.gender==='נקבה';
 
-  for (const student of roster) {
-    const female = student.gender === 'נקבה';
-    let tasksHtml = '';
+    // Parent info block
+    let parentsHtml='';
+    const p1=student.parent1Name, p2=student.parent2Name;
+    const e1=student.email1,      e2=student.email2;
+    const lines=[];
+    if(p1||e1){
+      let line=p1?esc(p1):'';
+      if(e1) line+=(line?' — ':'')+`<a href="mailto:${esc(e1)}">${esc(e1)}</a>`;
+      lines.push(line);
+    }
+    if(p2||e2){
+      let line=p2?esc(p2):'';
+      if(e2) line+=(line?' — ':'')+`<a href="mailto:${esc(e2)}">${esc(e2)}</a>`;
+      lines.push(line);
+    }
+    if(lines.length) parentsHtml=`<div class="card-parents">${lines.join('<br>')}</div>`;
 
-    for (const [taskName, task] of filteredTasks) {
-      const activeLevels = [...new Set(task.questions.map(q=>q.level))];
-      const showLevels   = task.hasLevels && activeLevels.length > 1;
-      const scores = getScores(task, student);
-      const stats  = computeStats(scores, task.questions, task.totalQ);
-
-      if (!stats || stats.notStarted) {
-        tasksHtml += `<div class="card-task-block">
+    // Tasks
+    let tasksHtml='';
+    for(const[taskName,task]of filteredTasks){
+      const activeLevels=[...new Set(task.questions.map(q=>q.level))];
+      const showLevels=task.hasLevels&&activeLevels.length>1;
+      const scores=getScores(task,student);
+      const stats =computeStats(scores,task.questions,task.totalQ);
+      if(!stats||stats.notStarted){
+        tasksHtml+=`<div class="card-task-block">
           <div class="card-task-name">${esc(taskName)}</div>
           <span class="notstarted-text">${female?'טרם עשתה':'טרם עשה'}</span>
         </div>`;
         continue;
       }
-
-      const lv      = stats.avg !== null ? getScoreLevel(stats.avg) : null;
-      const lvColor = lv ? SCORE_COLORS[lv] : '#888';
-
-      let levelsHtml = '';
-      if (showLevels) {
-        for (const ln of Q_LEVELS) {
-          if (!activeLevels.includes(ln)) continue;
-          const ls = stats.levelStats[ln];
-          if (!ls) continue;
-          if (ls.noAnswer) {
-            levelsHtml += `<div class="card-level-row">
+      const lv=stats.avg!==null?getScoreLevel(stats.avg):null;
+      const lvColor=lv?SCORE_COLORS[lv]:'#888';
+      let levelsHtml='';
+      if(showLevels){
+        for(const ln of Q_LEVELS){
+          if(!activeLevels.includes(ln)) continue;
+          const ls=stats.levelStats[ln]; if(!ls) continue;
+          if(ls.noAnswer){
+            levelsHtml+=`<div class="card-level-row">
               <span class="card-level-name">${esc(ln)}</span>
-              <span style="color:#aaa">${female?'לא ענתה':'לא ענה'}</span>
-            </div>`;
-          } else {
-            const ll = ls.avg !== null ? getScoreLevel(ls.avg) : null;
-            levelsHtml += `<div class="card-level-row">
+              <span style="color:#aaa">${female?'לא ענתה':'לא ענה'}</span></div>`;
+          }else{
+            const ll=ls.avg!==null?getScoreLevel(ls.avg):null;
+            levelsHtml+=`<div class="card-level-row">
               <span class="card-level-name">${esc(ln)}</span>
               <span>${ll?`<span class="badge lbadge lb-${ll}">`:''} ${ls.avg??'—'} ${ll?'</span>':''} <small style="color:#888">(${ls.solvedCount} שאלות)</small></span>
             </div>`;
           }
         }
       }
-
-      tasksHtml += `<div class="card-task-block done">
+      tasksHtml+=`<div class="card-task-block done">
         <div class="card-task-name">${esc(taskName)}</div>
         <div class="card-task-avg" style="color:${lvColor}">${stats.avg??'—'}</div>
         <div class="card-avg-basis">מבוסס על ${stats.solvedCount} מתוך ${task.totalQ} שאלות</div>
@@ -656,106 +631,95 @@ function renderTab2() {
       </div>`;
     }
 
-    html += `<div class="card">
+    html+=`<div class="card">
       <div class="card-student-name">${esc(student.fullName)}</div>
+      ${parentsHtml}
       ${tasksHtml}
     </div>`;
   }
-
-  html += '</div>';
-  document.getElementById('t2c').innerHTML = html;
+  html+='</div>';
+  document.getElementById('t2c').innerHTML=html;
 }
 
-// ══════════════════════════════ TAB 3 — ALERT REPORT ══════════════════════════════
-function renderTab3() {
-  const filteredTasks = getFiltered();
-  let html = '';
-
-  for (const [taskName, task] of filteredTasks) {
-    const notDone   = [];
-    const struggle  = [];
-    const far       = [];
-
-    for (const student of roster) {
-      const scores = getScores(task, student);
-      const stats  = computeStats(scores, task.questions, task.totalQ);
-
-      if (!stats || stats.notStarted) {
-        notDone.push(student);
-      } else if (stats.avg !== null) {
-        if (stats.avg >= 40 && stats.avg <= 59) struggle.push({student, avg: stats.avg});
-        else if (stats.avg >= 1 && stats.avg <= 39) far.push({student, avg: stats.avg});
+// ══════════════════════ TAB 3 — ALERT REPORT ══════════════════════
+function renderTab3(){
+  const filteredTasks=getFiltered(); let html='';
+  for(const[taskName,task]of filteredTasks){
+    const notDone=[], struggle=[], far=[];
+    for(const student of roster){
+      const scores=getScores(task,student);
+      const stats =computeStats(scores,task.questions,task.totalQ);
+      if(!stats||stats.notStarted){ notDone.push(student); continue; }
+      if(stats.avg!==null){
+        if(stats.avg>=40&&stats.avg<=59) struggle.push({student,avg:stats.avg});
+        else if(stats.avg>=1&&stats.avg<=39) far.push({student,avg:stats.avg});
       }
     }
 
     // Section: not done
     let notDoneHtml;
-    if (!notDone.length) {
-      notDoneHtml = '<p class="alert-empty">אין תלמידים שטרם ביצעו את המשימה</p>';
-    } else {
-      notDoneHtml = `<table class="alert-table">
-        <thead><tr><th>שם תלמיד/ה</th><th>שם הורה</th><th>דוא"ל 1</th><th>דוא"ל 2</th></tr></thead>
-        <tbody>`;
-      for (const s of notDone) {
-        const email1Link = s.email1 ? `<a href="mailto:${esc(s.email1)}">${esc(s.email1)}</a>` : '—';
-        const email2Link = s.email2 ? `<a href="mailto:${esc(s.email2)}">${esc(s.email2)}</a>` : '—';
-        notDoneHtml += `<tr>
+    if(!notDone.length){
+      notDoneHtml='<p class="alert-empty">אין תלמידים שטרם ביצעו את המשימה</p>';
+    }else{
+      notDoneHtml=`<table class="alert-table">
+        <thead><tr>
+          <th>שם תלמיד/ה</th>
+          <th>שם הורה 1</th><th>דוא"ל הורה 1</th>
+          <th>שם הורה 2</th><th>דוא"ל הורה 2</th>
+        </tr></thead><tbody>`;
+      for(const s of notDone){
+        const e1=s.email1?`<a href="mailto:${esc(s.email1)}">${esc(s.email1)}</a>`:'—';
+        const e2=s.email2?`<a href="mailto:${esc(s.email2)}">${esc(s.email2)}</a>`:'—';
+        notDoneHtml+=`<tr>
           <td>${esc(s.fullName)}</td>
-          <td>${esc(s.parentName)||'—'}</td>
-          <td>${email1Link}</td>
-          <td>${email2Link}</td>
+          <td>${esc(s.parent1Name)||'—'}</td><td>${e1}</td>
+          <td>${esc(s.parent2Name)||'—'}</td><td>${e2}</td>
         </tr>`;
       }
-      notDoneHtml += '</tbody></table>';
+      notDoneHtml+='</tbody></table>';
     }
 
     // Section: struggle
     let struggleHtml;
-    if (!struggle.length) {
-      struggleHtml = '<p class="alert-empty">אין תלמידים בטווח זה</p>';
-    } else {
-      struggleHtml = `<table class="alert-table">
+    if(!struggle.length){
+      struggleHtml='<p class="alert-empty">אין תלמידים בטווח זה</p>';
+    }else{
+      struggleHtml=`<table class="alert-table">
         <thead><tr><th>שם תלמיד/ה</th><th>ציון ממוצע</th></tr></thead><tbody>`;
-      for (const {student, avg} of struggle) {
-        struggleHtml += `<tr><td>${esc(student.fullName)}</td><td>${badge('struggle')} ${avg}</td></tr>`;
-      }
-      struggleHtml += '</tbody></table>';
+      for(const{student:s,avg}of struggle)
+        struggleHtml+=`<tr><td>${esc(s.fullName)}</td><td>${badge('struggle')} ${avg}</td></tr>`;
+      struggleHtml+='</tbody></table>';
     }
 
     // Section: far
     let farHtml;
-    if (!far.length) {
-      farHtml = '<p class="alert-empty">אין תלמידים בטווח זה</p>';
-    } else {
-      farHtml = `<table class="alert-table">
+    if(!far.length){
+      farHtml='<p class="alert-empty">אין תלמידים בטווח זה</p>';
+    }else{
+      farHtml=`<table class="alert-table">
         <thead><tr><th>שם תלמיד/ה</th><th>ציון ממוצע</th></tr></thead><tbody>`;
-      for (const {student, avg} of far) {
-        farHtml += `<tr><td>${esc(student.fullName)}</td><td>${badge('far')} ${avg}</td></tr>`;
-      }
-      farHtml += '</tbody></table>';
+      for(const{student:s,avg}of far)
+        farHtml+=`<tr><td>${esc(s.fullName)}</td><td>${badge('far')} ${avg}</td></tr>`;
+      farHtml+='</tbody></table>';
     }
 
-    html += `<div class="alert-task-section">
+    html+=`<div class="alert-task-section">
       <div class="alert-task-title">${esc(taskName)}</div>
-
       <div class="alert-sub">
         <div class="alert-sub-title notdone">טרם ביצעו את המשימה (${notDone.length})</div>
         ${notDoneHtml}
       </div>
-
       <div class="alert-sub">
         <div class="alert-sub-title struggle">מתקשה — ציון 40–59 (${struggle.length})</div>
         ${struggleHtml}
       </div>
-
       <div class="alert-sub">
         <div class="alert-sub-title far">רחוק מהיעד — ציון 1–39 (${far.length})</div>
         ${farHtml}
       </div>
     </div>`;
   }
-
-  document.getElementById('t3c').innerHTML = html || '<p style="color:#aaa;padding:20px">אין נתונים</p>';
+  document.getElementById('t3c').innerHTML=html||'<p style="color:#aaa;padding:20px">אין נתונים</p>';
 }
 </script>
 </body>
