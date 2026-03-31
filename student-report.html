@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>דוח ביצועים כיתתי</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#222;direction:rtl}
+h1{font-size:1.5rem;font-weight:700}
+
+/* UPLOAD */
+#uploadScreen{max-width:720px;margin:40px auto;padding:24px}
+#uploadScreen h1{margin-bottom:24px;text-align:center;color:#2c3e50}
+.upload-section{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.upload-section h2{font-size:1rem;margin-bottom:12px;color:#444}
+.dropzone{border:2px dashed #bbb;border-radius:8px;padding:28px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;color:#888;font-size:.9rem;user-select:none}
+.dropzone:hover,.dropzone.dragover{border-color:#3498db;background:#eaf4fb;color:#3498db}
+.file-list{margin-top:10px}
+.file-item{display:flex;align-items:center;justify-content:space-between;background:#f8f8f8;border-radius:6px;padding:6px 10px;margin-top:6px;font-size:.85rem}
+.file-item .rm{cursor:pointer;color:#e74c3c;font-weight:700;padding:0 6px;font-size:1rem}
+#generateBtn{display:block;width:100%;padding:14px;background:#2ecc71;color:#fff;border:none;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;transition:background .2s;margin-top:4px}
+#generateBtn:disabled{background:#aaa;cursor:not-allowed}
+#generateBtn:not(:disabled):hover{background:#27ae60}
+#uploadErr{color:#e74c3c;font-size:.85rem;margin-top:10px;padding:8px 12px;background:#fdecea;border-radius:6px;display:none}
+
+/* REPORT */
+#reportScreen{display:none;max-width:1280px;margin:0 auto;padding:20px}
+.rpt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.hdr-btns{display:flex;gap:8px}
+.print-btn,.back-btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:600}
+.print-btn{background:#3498db;color:#fff}
+.back-btn{background:#ecf0f1;color:#555}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center;background:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.legend-lbl{font-weight:700;font-size:.85rem;color:#555}
+.lbadge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.78rem;font-weight:600;color:#fff}
+.lb-excellent{background:#27ae60}.lb-good{background:#2980b9}.lb-basic{background:#16a085}
+.lb-struggle{background:#e67e22}.lb-far{background:#e74c3c}.lb-notdone{background:#95a5a6}
+
+/* FILTERS */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.filter-btn{padding:6px 16px;border:2px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s}
+.filter-btn.active,.filter-btn:hover{border-color:#3498db;background:#3498db;color:#fff}
+
+/* TABS */
+.tabs{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden}
+.tab-btns{display:flex;border-bottom:2px solid #ecf0f1}
+.tab-btn{flex:1;padding:13px;border:none;background:none;cursor:pointer;font-size:.9rem;font-weight:600;color:#888;transition:all .2s}
+.tab-btn.active{color:#3498db;border-bottom:3px solid #3498db;margin-bottom:-2px;background:#f8fbff}
+.tab-pane{display:none;padding:20px}
+.tab-pane.active{display:block}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+.rpt-table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:700px}
+.rpt-table th{background:#2c3e50;color:#fff;padding:9px 10px;text-align:center;white-space:nowrap;font-size:.78rem}
+.rpt-table td{padding:7px 10px;border-bottom:1px solid #eee;text-align:center;vertical-align:middle}
+.rpt-table tbody tr:hover td{background:#f5f8ff}
+.rpt-table td:first-child{text-align:right;font-weight:600;white-space:nowrap}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.75rem;font-weight:600;color:#fff}
+.task-heading{margin:18px 0 10px;color:#2c3e50;font-size:1rem;font-weight:700;padding:6px 12px;background:#eaf0fb;border-radius:6px;border-right:4px solid #3498db}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 2px 6px rgba(0,0,0,.08);border-top:4px solid #3498db}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.card-name{font-weight:700;font-size:.98rem}
+.card-task{font-size:.77rem;color:#888;margin-top:2px}
+.card-avg .avg-val{font-size:1.4rem;font-weight:700;display:block;text-align:left}
+.card-avg .avg-basis{font-size:.7rem;color:#888;text-align:left;display:block}
+.card-levels{margin-bottom:10px}
+.level-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f2f2f2;font-size:.8rem}
+.level-row:last-child{border-bottom:none}
+.level-name{color:#555;font-weight:600}
+.progress-wrap{margin-top:10px}
+.progress-label{font-size:.75rem;color:#888;margin-bottom:4px;display:flex;justify-content:space-between}
+.progress-bar{height:8px;background:#eee;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px}
+.bands-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.band-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:.7rem;font-weight:600;color:#fff}
+.notstarted-text{color:#aaa;font-style:italic;font-size:.88rem;padding:6px 0}
+
+/* SUMMARY */
+.summary-section{margin-bottom:24px;padding:16px;border:1px solid #e8e8e8;border-radius:10px}
+.summary-task-title{font-size:1rem;font-weight:700;margin-bottom:14px;color:#2c3e50}
+.summary-stats{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.stat-box{text-align:center;background:#f8f8f8;border-radius:8px;padding:10px 18px;min-width:80px}
+.stat-val{font-size:1.5rem;font-weight:700;color:#2c3e50}
+.stat-lbl{font-size:.72rem;color:#888;margin-top:2px}
+.chart-wrap{display:flex;flex-direction:column;gap:5px}
+.chart-row{display:flex;align-items:center;gap:8px;font-size:.8rem}
+.chart-lbl{width:110px;text-align:right;font-weight:600;color:#555;flex-shrink:0}
+.chart-bar-wrap{flex:1;background:#eee;border-radius:4px;height:22px;overflow:hidden}
+.chart-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:.72rem;color:#fff;font-weight:600;transition:width .4s}
+.chart-num{width:36px;text-align:left;color:#555;font-weight:600;flex-shrink:0}
+
+@media print{
+  #uploadScreen{display:none!important}
+  .hdr-btns,.filters,.tab-btns{display:none!important}
+  .tab-pane{display:block!important}
+  .card,.summary-section{break-inside:avoid}
+  #reportScreen{padding:0}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ UPLOAD ══════════ -->
+<div id="uploadScreen">
+  <h1>📊 דוח ביצועים כיתתי</h1>
+
+  <div class="upload-section">
+    <h2>קבצי דוח (אחד או יותר)</h2>
+    <div class="dropzone" id="dzReports" onclick="document.getElementById('inReports').click()">
+      גרור קבצי Excel לכאן, או לחץ לבחירה
+    </div>
+    <input type="file" id="inReports" accept=".xlsx,.xls" multiple style="display:none">
+    <div class="file-list" id="listReports"></div>
+  </div>
+
+  <div class="upload-section">
+    <h2>קובץ רשימת כיתה</h2>
+    <div class="dropzone" id="dzClass" onclick="document.getElementById('inClass').click()">
+      גרור קובץ Excel לכאן, או לחץ לבחירה
+    </div>
+    <input type="file" id="inClass" accept=".xlsx,.xls" style="display:none">
+    <div class="file-list" id="listClass"></div>
+  </div>
+
+  <button id="generateBtn" onclick="generateReport()" disabled>צור דוח</button>
+  <div id="uploadErr"></div>
+</div>
+
+<!-- ══════════ REPORT ══════════ -->
+<div id="reportScreen">
+  <div class="rpt-header">
+    <h1>📊 דוח ביצועים כיתתי</h1>
+    <div class="hdr-btns">
+      <button class="print-btn" onclick="window.print()">🖨️ הדפסה</button>
+      <button class="back-btn" onclick="goBack()">← חזרה</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-lbl">מקרא:</span>
+    <span class="lbadge lb-excellent">מצוין (90–100)</span>
+    <span class="lbadge lb-good">טוב מאוד (75–89)</span>
+    <span class="lbadge lb-basic">טוב (60–74)</span>
+    <span class="lbadge lb-struggle">מתקשה (40–59)</span>
+    <span class="lbadge lb-far">רחוק מהיעד (1–39)</span>
+    <span class="lbadge lb-notdone">לא פתר/לא פתרה (0)</span>
+  </div>
+
+  <div class="filters" id="taskFilters"></div>
+
+  <div class="tabs">
+    <div class="tab-btns">
+      <button class="tab-btn active" onclick="switchTab('t1',this)">טבלת פירוט</button>
+      <button class="tab-btn" onclick="switchTab('t2',this)">כרטיסיות תלמידים</button>
+      <button class="tab-btn" onclick="switchTab('t3',this)">סיכום כיתתי</button>
+    </div>
+    <div class="tab-pane active" id="t1"><div id="t1c"></div></div>
+    <div class="tab-pane"        id="t2"><div id="t2c"></div></div>
+    <div class="tab-pane"        id="t3"><div id="t3c"></div></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════ STATE ═══════════════════════
+let roster     = [];  // [{firstName, lastName, fullName, gender}]
+let tasks      = {};  // {taskName: {totalQ, questions:[{num,level}], students:{reportKey:scores[]}}}
+let classFile  = null;
+let reportFiles= [];
+let activeTask = null;
+
+// ═══════════════════════ CONSTANTS ═══════════════════════
+const LEVEL_LABELS  = {excellent:'מצוין',good:'טוב מאוד',basic:'טוב',struggle:'מתקשה',far:'רחוק מהיעד',notdone:'לא פתר/לא פתרה'};
+const LEVEL_COLORS  = {excellent:'#27ae60',good:'#2980b9',basic:'#16a085',struggle:'#e67e22',far:'#e74c3c',notdone:'#95a5a6'};
+const Q_LEVELS      = ['הבנה בסיסית','שאלה מילולית','תובנה גבוהה'];
+
+// ═══════════════════════ UTILS ═══════════════════════
+const norm   = s => String(s ?? '').trim().replace(/\s+/g,' ');
+const normLC = s => norm(s).toLowerCase();
+const esc    = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function getScoreLevel(score) {
+  if (score === null || score === undefined) return null;
+  const n = +score;
+  if (isNaN(n)) return null;
+  if (n === 0)  return 'notdone';
+  if (n >= 90)  return 'excellent';
+  if (n >= 75)  return 'good';
+  if (n >= 60)  return 'basic';
+  if (n >= 40)  return 'struggle';
+  return 'far';
+}
+
+function badge(level) {
+  return level ? `<span class="badge lbadge lb-${level}">${LEVEL_LABELS[level]}</span>` : '';
+}
+
+// ═══════════════════════ DROP ZONES ═══════════════════════
+function setupDrop(dzId, inputId, onFiles) {
+  const dz = document.getElementById(dzId), inp = document.getElementById(inputId);
+  dz.addEventListener('dragover',  e=>{ e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', ()=> dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e=>{
+    e.preventDefault(); dz.classList.remove('dragover');
+    onFiles([...e.dataTransfer.files].filter(f => /\.xlsx?$/i.test(f.name)));
+  });
+  inp.addEventListener('change', ()=>{ onFiles([...inp.files]); inp.value=''; });
+}
+setupDrop('dzReports','inReports', files=>{
+  reportFiles = [...reportFiles, ...files]; renderReportList(); ready();
+});
+setupDrop('dzClass','inClass', files=>{
+  if (!files.length) return;
+  classFile = files[0];
+  document.getElementById('listClass').innerHTML =
+    `<div class="file-item">📄 ${esc(classFile.name)} <span class="rm" onclick="removeClass(event)">×</span></div>`;
+  ready();
+});
+function removeClass(e){ e.stopPropagation(); classFile=null; document.getElementById('listClass').innerHTML=''; ready(); }
+function removeReport(e,i){ e.stopPropagation(); reportFiles.splice(i,1); renderReportList(); ready(); }
+function renderReportList(){
+  document.getElementById('listReports').innerHTML =
+    reportFiles.map((f,i)=>`<div class="file-item">📊 ${esc(f.name)} <span class="rm" onclick="removeReport(event,${i})">×</span></div>`).join('');
+}
+function ready(){ document.getElementById('generateBtn').disabled = !(classFile && reportFiles.length); }
+function goBack(){ document.getElementById('reportScreen').style.display='none'; document.getElementById('uploadScreen').style.display='block'; }
+
+// ═══════════════════════ EXCEL HELPERS ═══════════════════════
+function readWb(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>{ try{ res(XLSX.read(e.target.result,{type:'array'})); }catch(err){ rej(err); } };
+    r.onerror=rej; r.readAsArrayBuffer(file);
+  });
+}
+
+// ═══════════════════════ PARSE ROSTER ═══════════════════════
+// Header is at row index 2 (row 3). Find "שם", "שם משפחה", "מין" columns by header text.
+function parseRoster(wb){
+  const ws   = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:null});
+
+  const hdrRow = rows[2]; // row index 2 = row 3
+  if (!hdrRow) return [];
+
+  let firstCol=-1, lastCol=-1, genderCol=-1;
+  for(let j=0; j<hdrRow.length; j++){
+    const h = norm(hdrRow[j]);
+    if(h === 'שם' && firstCol < 0)          firstCol  = j;
+    else if(h === 'שם משפחה' && lastCol < 0) lastCol   = j;
+    else if(h === 'מין' && genderCol < 0)    genderCol = j;
+  }
+
+  const out = [];
+  for(let i=3; i<rows.length; i++){
+    const row = rows[i]; if(!row) continue;
+    const first  = firstCol  >= 0 ? norm(row[firstCol])  : '';
+    const last   = lastCol   >= 0 ? norm(row[lastCol])   : '';
+    const genRaw = genderCol >= 0 ? norm(row[genderCol]) : '';
+    if(!first && !last) continue;
+    const fullName = (first + ' ' + last).trim();
+    const gender   = genRaw.includes('נקבה') ? 'נקבה' : 'זכר';
+    out.push({firstName:first, lastName:last, fullName, gender});
+  }
+  return out;
+}
+
+// ═══════════════════════ NAME MATCHING ═══════════════════════
+// reportName = full string from report (e.g. "הרוש שלו זוהר")
+// rosterStudent = {firstName, lastName, fullName}
+// Algorithm:
+//   Step 1: ALL words of lastName appear in reportName AND firstName appears → match
+//   Step 2: ALL words of lastName appear in reportName → match
+function namesMatch(reportName, rosterStudent){
+  const rn = normLC(reportName);
+  const lastWords = normLC(rosterStudent.lastName).split(' ').filter(Boolean);
+  const first     = normLC(rosterStudent.firstName);
+
+  const allLastIn = lastWords.length > 0 && lastWords.every(w => {
+    // match as whole word
+    const re = new RegExp('(?:^|\\s)' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '(?:\\s|$)');
+    return re.test(rn);
+  });
+
+  if(!allLastIn) return false;
+
+  if(first){
+    const re = new RegExp('(?:^|\\s)' + first.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '(?:\\s|$)');
+    if(re.test(rn)) return true; // step 1 matched
+  }
+
+  return true; // step 2: last name matched, first not required
+}
+
+function findRosterStudent(reportName){
+  const rn = normLC(reportName);
+  // step 1: all words of lastName + firstName
+  for(const s of roster){
+    const lastWords = normLC(s.lastName).split(' ').filter(Boolean);
+    const first     = normLC(s.firstName);
+    if(!lastWords.length) continue;
+    const allLastIn = lastWords.every(w=>{
+      const re = new RegExp('(?:^|\\s)' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '(?:\\s|$)');
+      return re.test(rn);
+    });
+    if(allLastIn && first){
+      const re = new RegExp('(?:^|\\s)' + first.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '(?:\\s|$)');
+      if(re.test(rn)) return s;
+    }
+  }
+  // step 2: all words of lastName only
+  for(const s of roster){
+    const lastWords = normLC(s.lastName).split(' ').filter(Boolean);
+    if(!lastWords.length) continue;
+    const allLastIn = lastWords.every(w=>{
+      const re = new RegExp('(?:^|\\s)' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '(?:\\s|$)');
+      return re.test(rn);
+    });
+    if(allLastIn) return s;
+  }
+  return null;
+}
+
+// ═══════════════════════ PARSE REPORT — TYPE A ═══════════════════════
+function parseTypeA(ws){
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:null});
+
+  // Task name: row 0, cell to the right of "שם המשימה:"
+  let taskName = '';
+  const row0 = rows[0] || [];
+  for(let j=0; j<row0.length; j++){
+    const c = norm(row0[j]);
+    if(c.includes('שם המשימה')){
+      // value might be in same cell after colon or in next cell
+      const after = c.replace(/שם המשימה\s*:?\s*/,'').trim();
+      if(after){ taskName=after; break; }
+      for(let k=j+1; k<row0.length; k++){
+        const v=norm(row0[k]); if(v){ taskName=v; break; }
+      }
+      break;
+    }
+  }
+
+  // Row 7 (index 7): question headers "שאלה N" starting at col 7
+  const hdrRow   = rows[7] || [];
+  const levelRow = rows[8] || [];
+
+  const qCols = []; // {idx, num, level}
+  for(let j=7; j<hdrRow.length; j++){
+    const m = norm(hdrRow[j]).match(/^שאלה\s*(\d+)$/);
+    if(!m) continue;
+    const num   = parseInt(m[1]);
+    const lvRaw = norm(levelRow[j]);
+    const level = Q_LEVELS.includes(lvRaw) ? lvRaw : 'הבנה בסיסית';
+    qCols.push({idx:j, num, level});
+  }
+
+  const totalQ   = qCols.length ? Math.max(...qCols.map(q=>q.num)) : 0;
+  const questions = qCols.map(q=>({num:q.num, level:q.level}));
+  const hasLevels = questions.some(q=>q.level !== 'הבנה בסיסית');
+
+  const SKIP = ['ממוצע','סה"כ','סהכ','כיתה'];
+  const students = {}; // reportName → scores[]
+
+  for(let i=10; i<rows.length; i++){
+    const row = rows[i]; if(!row) continue;
+    const rawName = norm(row[0]);
+    if(!rawName) continue;
+    if(SKIP.some(w=>rawName.includes(w))) continue;
+    const status = norm(row[2]);
+
+    if(status === 'טרם הותחלה'){
+      students[rawName] = new Array(totalQ).fill(null);
+      students[rawName]._notStarted = true;
+      continue;
+    }
+
+    const scores = new Array(totalQ).fill(null);
+    for(const {idx,num} of qCols){
+      if(num<1||num>totalQ) continue;
+      const val = row[idx];
+      const s   = String(val??'').trim();
+      if(s===''||s==='-'||val===null||val===undefined){ scores[num-1]=null; continue; }
+      const n = +val;
+      scores[num-1] = isNaN(n) ? null : n;
+    }
+    students[rawName] = scores;
+  }
+
+  return {taskName: taskName||'משימה', totalQ, questions, students, hasLevels};
+}
+
+// ═══════════════════════ PARSE REPORT — TYPE B ═══════════════════════
+function parseTypeB(ws){
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:null});
+  if(!rows.length) return null;
+
+  const hdr = rows[0] || [];
+  // col 0 = student name, rest = topic names
+  const topicCols = []; // {idx, name}
+  for(let j=1; j<hdr.length; j++){
+    const t = norm(hdr[j]);
+    if(t) topicCols.push({idx:j, name:t});
+  }
+
+  const totalQ    = topicCols.length;
+  const questions = topicCols.map((t,i)=>({num:i+1, level:'הבנה בסיסית'}));
+  const SKIP      = ['ממוצע','סה"כ','סהכ'];
+  const students  = {};
+
+  for(let i=2; i<rows.length; i++){  // skip row 1 (averages)
+    const row = rows[i]; if(!row) continue;
+    const rawName = norm(row[0]);
+    if(!rawName) continue;
+    if(SKIP.some(w=>rawName.includes(w))) continue;
+
+    const scores = new Array(totalQ).fill(null);
+    for(let k=0; k<topicCols.length; k++){
+      const val = row[topicCols[k].idx];
+      const s   = String(val??'').trim();
+      if(s===''||s==='-'||val===null||val===undefined){ scores[k]=null; continue; }
+      const n = +val;
+      scores[k] = isNaN(n) ? null : n;
+    }
+    students[rawName] = scores;
+  }
+
+  // Use first topic column header as task name if not found elsewhere
+  const taskName = topicCols.length ? ('משימה') : 'משימה';
+  return {taskName, totalQ, questions, students, hasLevels:false};
+}
+
+// ═══════════════════════ MERGE TASKS ═══════════════════════
+function mergeTasks(a, b){
+  const totalQ    = Math.max(a.totalQ, b.totalQ);
+  const qMap      = {};
+  for(const q of a.questions) qMap[q.num]=q;
+  for(const q of b.questions) qMap[q.num]=q;
+  const questions = Object.values(qMap).sort((x,y)=>x.num-y.num);
+  const students  = {};
+
+  for(const [n,sc] of Object.entries(a.students)){
+    students[n]=[...sc];
+    while(students[n].length<totalQ) students[n].push(null);
+  }
+  for(const [n,sc] of Object.entries(b.students)){
+    if(!students[n]){
+      students[n]=[...sc];
+      while(students[n].length<totalQ) students[n].push(null);
+    } else {
+      const ex=students[n];
+      for(let i=0; i<Math.max(ex.length,sc.length); i++){
+        const av=ex[i]??null, bv=sc[i]??null;
+        ex[i]=(av===null)?bv:(bv===null)?av:Math.max(av,bv);
+      }
+    }
+  }
+  return {totalQ, questions, students, hasLevels: a.hasLevels||b.hasLevels};
+}
+
+// ═══════════════════════ COMPUTE STATS ═══════════════════════
+function computeStats(scores, questions, totalQ){
+  if(!scores) return null;
+  if(scores._notStarted) return {notStarted:true};
+
+  const answered  = scores.filter(s=>s!==null&&s!==undefined);
+  const solved    = answered.filter(s=>s>0);
+  const allEmpty  = answered.length===0 || answered.every(s=>s===0);
+  if(allEmpty) return {notStarted:true};
+
+  const avg = solved.length ? Math.round(solved.reduce((a,b)=>a+b,0)/solved.length) : null;
+  const bands = {excellent:0,good:0,basic:0,struggle:0,far:0,notdone:0};
+  for(const s of answered){ const lv=getScoreLevel(s); if(lv) bands[lv]++; }
+
+  const levelStats = {};
+  for(const ln of Q_LEVELS){
+    const qNums = questions.filter(q=>q.level===ln).map(q=>q.num);
+    if(!qNums.length) continue;
+    const lvScores = qNums.map(n=>scores[n-1]??null).filter(s=>s!==null);
+    const lvSolved = lvScores.filter(s=>s>0);
+    const lvAvg    = lvSolved.length ? Math.round(lvSolved.reduce((a,b)=>a+b,0)/lvSolved.length) : null;
+    levelStats[ln] = {
+      avg: lvAvg,
+      solvedCount: lvSolved.length,
+      noAnswer: lvScores.length===0 || lvScores.every(s=>s===0)
+    };
+  }
+
+  return {
+    notStarted:   false,
+    avg,
+    solvedCount:  solved.length,
+    totalQ,
+    answeredCount: answered.length,
+    bands,
+    levelStats,
+    pct: totalQ>0 ? Math.round(answered.length/totalQ*100) : 0
+  };
+}
+
+// ═══════════════════════ GENERATE ═══════════════════════
+async function generateReport(){
+  const btn=document.getElementById('generateBtn');
+  const err=document.getElementById('uploadErr');
+  err.style.display='none';
+  btn.disabled=true; btn.textContent='מעבד...';
+
+  try{
+    // Roster
+    const rWb = await readWb(classFile);
+    roster    = parseRoster(rWb);
+    if(!roster.length) throw new Error('לא נמצאו תלמידים בקובץ הכיתה — ודאי שהכותרת בשורה 3 ומכילה "שם", "שם משפחה", "מין"');
+
+    // Report files
+    tasks = {};
+    for(const file of reportFiles){
+      const wb = await readWb(file);
+      let data;
+      const sheetA = wb.SheetNames.find(n=>norm(n)==='ציון לפי שאלה');
+      const sheetB = wb.SheetNames.find(n=>norm(n)==='Sheet1');
+
+      if(sheetA){
+        data = parseTypeA(wb.Sheets[sheetA]);
+      } else if(sheetB){
+        data = parseTypeB(wb.Sheets[sheetB]);
+        if(!data) continue;
+        // use filename as task name for type B
+        data.taskName = file.name.replace(/\.xlsx?$/i,'');
+      } else {
+        // try first sheet as type A
+        data = parseTypeA(wb.Sheets[wb.SheetNames[0]]);
+      }
+
+      const tn = data.taskName;
+      tasks[tn] = tasks[tn] ? mergeTasks(tasks[tn], data) : {
+        totalQ:data.totalQ, questions:data.questions, students:data.students, hasLevels:data.hasLevels
+      };
+    }
+
+    if(!Object.keys(tasks).length) throw new Error('לא נמצאו משימות בקבצי הדוח');
+
+    activeTask = null;
+    renderFilters();
+    renderAll();
+    document.getElementById('uploadScreen').style.display ='none';
+    document.getElementById('reportScreen').style.display ='block';
+
+  } catch(e){
+    err.textContent = 'שגיאה: '+e.message;
+    err.style.display='block';
+    console.error(e);
+  } finally {
+    btn.disabled=false; btn.textContent='צור דוח';
+  }
+}
+
+// ═══════════════════════ FILTERS / TABS ═══════════════════════
+function renderFilters(){
+  let html='<button class="filter-btn active" onclick="setFilter(null,this)">כל המשימות</button>';
+  for(const t of Object.keys(tasks))
+    html+=`<button class="filter-btn" onclick="setFilter(${JSON.stringify(t)},this)">${esc(t)}</button>`;
+  document.getElementById('taskFilters').innerHTML=html;
+}
+function setFilter(t,btn){
+  activeTask=t;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+function getFiltered(){ return activeTask?[[activeTask,tasks[activeTask]]]:Object.entries(tasks); }
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); btn.classList.add('active');
+}
+function renderAll(){ renderTab1(); renderTab2(); renderTab3(); }
+
+// ═══════════════════════ SCORE LOOKUP ═══════════════════════
+function getScores(task, rosterStudent){
+  // try to match every key in task.students against this roster student
+  for(const [k,v] of Object.entries(task.students)){
+    if(findRosterStudent(k) === rosterStudent) return v;
+  }
+  // fallback: direct match attempt
+  for(const [k,v] of Object.entries(task.students)){
+    if(namesMatch(k, rosterStudent)) return v;
+  }
+  return null;
+}
+
+// ═══════════════════════ TAB 1 ═══════════════════════
+function renderTab1(){
+  const filtered = getFiltered();
+  let html='';
+  for(const [taskName,task] of filtered){
+    const activeLevels = [...new Set(task.questions.map(q=>q.level))];
+    const showLevels   = task.hasLevels && activeLevels.length>1;
+
+    html+=`<div class="task-heading">${esc(taskName)}</div>`;
+    html+=`<div class="tbl-wrap"><table class="rpt-table"><thead><tr>
+      <th>שם תלמיד/ה</th><th>שאלות שנענו</th><th>% השלמה</th><th>ציון ממוצע</th>`;
+    if(showLevels) for(const ln of Q_LEVELS) if(activeLevels.includes(ln)) html+=`<th>${esc(ln)}</th>`;
+    html+=`<th style="background:#1e8449">מצוין<br>90–100</th>
+           <th style="background:#1a5276">טוב מאוד<br>75–89</th>
+           <th style="background:#117a65">טוב<br>60–74</th>
+           <th style="background:#935116">מתקשה<br>40–59</th>
+           <th style="background:#922b21">רחוק מהיעד<br>1–39</th>
+           <th style="background:#717d7e">לא פתר/ה<br>0</th>
+    </tr></thead><tbody>`;
+
+    for(const student of roster){
+      const scores = getScores(task, student);
+      const stats  = computeStats(scores, task.questions, task.totalQ);
+
+      if(!stats||stats.notStarted){
+        const lbl = student.gender==='נקבה'?'טרם עשתה':'טרם עשה';
+        const span = 3+(showLevels?activeLevels.filter(l=>Q_LEVELS.includes(l)).length:0)+6;
+        html+=`<tr><td>${esc(student.fullName)}</td><td colspan="${span}" style="color:#aaa;font-style:italic">${lbl}</td></tr>`;
+        continue;
+      }
+
+      const lv = stats.avg!==null ? getScoreLevel(stats.avg) : null;
+      html+=`<tr>
+        <td>${esc(student.fullName)}</td>
+        <td>${stats.answeredCount} / ${task.totalQ}</td>
+        <td>${stats.pct}%</td>
+        <td>${lv?`<span class="badge lbadge lb-${lv}">`:''}${stats.avg??'—'}${lv?'</span>':''}<br><small style="color:#888">${stats.solvedCount}/${task.totalQ}</small></td>`;
+
+      if(showLevels){
+        for(const ln of Q_LEVELS){
+          if(!activeLevels.includes(ln)) continue;
+          const ls = stats.levelStats[ln];
+          if(!ls){ html+='<td>—</td>'; continue; }
+          if(ls.noAnswer){
+            html+=`<td style="color:#aaa">${student.gender==='נקבה'?'לא ענתה':'לא ענה'}</td>`;
+          } else {
+            const ll=ls.avg!==null?getScoreLevel(ls.avg):null;
+            html+=`<td>${ll?`<span class="badge lbadge lb-${ll}">`:''} ${ls.avg??'—'}${ll?'</span>':''}<br><small style="color:#888">${ls.solvedCount} שאלות</small></td>`;
+          }
+        }
+      }
+
+      const b=stats.bands;
+      html+=`<td>${b.excellent||'—'}</td><td>${b.good||'—'}</td><td>${b.basic||'—'}</td><td>${b.struggle||'—'}</td><td>${b.far||'—'}</td><td>${b.notdone||'—'}</td></tr>`;
+    }
+    html+='</tbody></table></div>';
+  }
+  document.getElementById('t1c').innerHTML = html||'<p style="color:#aaa;padding:20px">אין נתונים</p>';
+}
+
+// ═══════════════════════ TAB 2 ═══════════════════════
+function renderTab2(){
+  const filtered = getFiltered();
+  let html='<div class="cards-grid">';
+  for(const [taskName,task] of filtered){
+    const activeLevels = [...new Set(task.questions.map(q=>q.level))];
+    const showLevels   = task.hasLevels && activeLevels.length>1;
+
+    for(const student of roster){
+      const scores = getScores(task, student);
+      const stats  = computeStats(scores, task.questions, task.totalQ);
+      const female = student.gender==='נקבה';
+
+      if(!stats||stats.notStarted){
+        html+=`<div class="card">
+          <div class="card-header">
+            <div><div class="card-name">${esc(student.fullName)}</div><div class="card-task">${esc(taskName)}</div></div>
+          </div>
+          <p class="notstarted-text">${female?'טרם עשתה':'טרם עשה'}</p>
+        </div>`;
+        continue;
+      }
+
+      const lv      = stats.avg!==null?getScoreLevel(stats.avg):null;
+      const lvColor = lv?LEVEL_COLORS[lv]:'#aaa';
+
+      let lvHtml='';
+      if(showLevels){
+        lvHtml='<div class="card-levels">';
+        for(const ln of Q_LEVELS){
+          if(!activeLevels.includes(ln)) continue;
+          const ls=stats.levelStats[ln];
+          if(!ls) continue;
+          if(ls.noAnswer){
+            lvHtml+=`<div class="level-row"><span class="level-name">${esc(ln)}</span><span style="color:#aaa">${female?'לא ענתה':'לא ענה'}</span></div>`;
+          } else {
+            const ll=ls.avg!==null?getScoreLevel(ls.avg):null;
+            lvHtml+=`<div class="level-row">
+              <span class="level-name">${esc(ln)}</span>
+              <span>${ll?`<span class="badge lbadge lb-${ll}">`:''} ${ls.avg??'—'}${ll?'</span>':''} <small style="color:#888">(${ls.solvedCount} שאלות)</small></span>
+            </div>`;
+          }
+        }
+        lvHtml+='</div>';
+      }
+
+      const bandsHtml = Object.entries(stats.bands).filter(([,c])=>c>0)
+        .map(([k,c])=>`<span class="band-chip" style="background:${LEVEL_COLORS[k]}">${LEVEL_LABELS[k]}: ${c}</span>`).join('');
+
+      html+=`<div class="card" style="border-top-color:${lvColor}">
+        <div class="card-header">
+          <div><div class="card-name">${esc(student.fullName)}</div><div class="card-task">${esc(taskName)}</div></div>
+          <div class="card-avg">
+            <span class="avg-val" style="color:${lvColor}">${stats.avg??'—'}</span>
+            <span class="avg-basis">מבוסס על ${stats.solvedCount} מתוך ${task.totalQ}</span>
+          </div>
+        </div>
+        ${lvHtml}
+        <div class="bands-row">${bandsHtml}</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>השלמה</span><span>${stats.pct}%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${stats.pct}%;background:${lvColor}"></div></div>
+        </div>
+      </div>`;
+    }
+  }
+  html+='</div>';
+  document.getElementById('t2c').innerHTML=html;
+}
+
+// ═══════════════════════ TAB 3 ═══════════════════════
+function renderTab3(){
+  const filtered = getFiltered();
+  let html='';
+  for(const [taskName,task] of filtered){
+    let completed=0, notDone=0;
+    const bandTotals={excellent:0,good:0,basic:0,struggle:0,far:0,notdone:0};
+    for(const student of roster){
+      const scores=getScores(task,student);
+      const stats =computeStats(scores,task.questions,task.totalQ);
+      if(!stats||stats.notStarted){ notDone++; continue; }
+      completed++;
+      for(const [k,v] of Object.entries(stats.bands)) bandTotals[k]+=v;
+    }
+    const total    = roster.length;
+    const totalBnd = Object.values(bandTotals).reduce((a,b)=>a+b,0);
+    const bands    = [
+      {k:'excellent',l:'מצוין'},{k:'good',l:'טוב מאוד'},{k:'basic',l:'טוב'},
+      {k:'struggle',l:'מתקשה'},{k:'far',l:'רחוק מהיעד'},{k:'notdone',l:'לא פתר/ה'}
+    ];
+    const chartRows = bands.map(({k,l})=>{
+      const cnt=bandTotals[k], pct=totalBnd>0?Math.round(cnt/totalBnd*100):0;
+      return `<div class="chart-row">
+        <div class="chart-lbl">${l}</div>
+        <div class="chart-bar-wrap"><div class="chart-bar" style="width:${pct}%;background:${LEVEL_COLORS[k]}">${pct>8?pct+'%':''}</div></div>
+        <div class="chart-num">${cnt}</div>
+      </div>`;
+    }).join('');
+
+    html+=`<div class="summary-section">
+      <div class="summary-task-title">${esc(taskName)}</div>
+      <div class="summary-stats">
+        <div class="stat-box"><div class="stat-val">${total}</div><div class="stat-lbl">סה"כ תלמידים</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:#27ae60">${completed}</div><div class="stat-lbl">ביצעו</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:#e74c3c">${notDone}</div><div class="stat-lbl">טרם ביצעו</div></div>
+        <div class="stat-box"><div class="stat-val">${total?Math.round(completed/total*100):0}%</div><div class="stat-lbl">אחוז ביצוע</div></div>
+      </div>
+      <div class="chart-wrap">${chartRows}</div>
+    </div>`;
+  }
+  document.getElementById('t3c').innerHTML=html||'<p style="color:#aaa;padding:20px">אין נתונים</p>';
+}
+</script>
+</body>
+</html>
