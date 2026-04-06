@@ -673,11 +673,23 @@ function renderTab2(){
       const showLevels=task.hasLevels&&activeLevels.length>1;
       const scores=getScores(task,student);
       const stats =computeStats(scores,task.questions,task.totalQ);
-      // question numbers labeled הבנה בסיסית
-      const basicQNums=task.questions.filter(q=>q.level==='הבנה בסיסית').map(q=>q.num);
-      const basicQLine=basicQNums.length
-        ?`<div style="font-size:.72rem;color:#888;margin-bottom:5px">שאלות הבנה בסיסית: ${basicQNums.join(', ')}</div>`
-        :'';
+      // question numbers labeled הבנה בסיסית — compress runs, max 12
+      const basicQNums=task.questions.filter(q=>q.level==='הבנה בסיסית').map(q=>q.num).sort((a,b)=>a-b).slice(0,12);
+      const basicQLine=(()=>{
+        if(!basicQNums.length) return '';
+        // compress consecutive runs into ranges
+        const parts=[];
+        let start=basicQNums[0], end=basicQNums[0];
+        for(let k=1;k<basicQNums.length;k++){
+          if(basicQNums[k]===end+1){ end=basicQNums[k]; }
+          else{
+            parts.push(end>start+1?`${start}-${end}`:end===start+1?`${start}, ${end}`:`${start}`);
+            start=end=basicQNums[k];
+          }
+        }
+        parts.push(end>start+1?`${start}-${end}`:end===start+1?`${start}, ${end}`:`${start}`);
+        return `<div style="font-size:.72rem;color:#888;margin-bottom:5px">שאלות הבנה בסיסית: ${parts.join(', ')}</div>`;
+      })();
 
       if(!stats||stats.notStarted){
         tasksHtml+=`<div class="card-task-block">
