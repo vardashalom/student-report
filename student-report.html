@@ -253,30 +253,42 @@ function readWb(file){
 function parseRoster(wb){
   const ws  =wb.Sheets[wb.SheetNames[0]];
   const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
-  const hdr =rows[2]; if(!hdr) return [];
 
-  // find column indices — "שם הורה" may appear twice
+  // Scan ALL rows to find the header row — the one that contains both "שם" and "משפחה"
+  let hdrIdx=-1;
   let firstCol=-1,lastCol=-1,genderCol=-1;
   let parent1Col=-1,parent2Col=-1,email1Col=-1,email2Col=-1;
   let teacherCol=-1,classLetterCol=-1;
 
-  for(let j=0;j<hdr.length;j++){
-    const h=norm(hdr[j]);
-    if(h==='שם'                    && firstCol<0)       firstCol=j;
-    if(h==='שם משפחה'              && lastCol<0)        lastCol=j;
-    if(h==='מין'                   && genderCol<0)      genderCol=j;
-    if(h==='שם הורה'               && parent1Col<0)     parent1Col=j;
-    else if(h==='שם הורה'          && parent2Col<0)     parent2Col=j;
-    if(h==='דוא"ל אפוטרופוס 1'    && email1Col<0)      email1Col=j;
-    if(h==='דוא"ל אפוטרופוס 2'    && email2Col<0)      email2Col=j;
-    if(h==='חונך/כת'               && teacherCol<0)     teacherCol=j;
-    if(h==='כיתת אם'               && classLetterCol<0) classLetterCol=j;
+  for(let i=0;i<rows.length;i++){
+    const row=rows[i]; if(!row) continue;
+    let fc=-1,lc=-1;
+    for(let j=0;j<row.length;j++){
+      const h=norm(row[j]);
+      if(h==='שם'       && fc<0) fc=j;
+      if(h.includes('משפחה') && lc<0) lc=j;
+    }
+    if(fc>=0&&lc>=0){ // found header row
+      hdrIdx=i; firstCol=fc; lastCol=lc;
+      for(let j=0;j<row.length;j++){
+        const h=norm(row[j]);
+        if(h==='מין'                && genderCol<0)      genderCol=j;
+        if(h==='שם הורה'            && parent1Col<0)     parent1Col=j;
+        else if(h==='שם הורה'       && parent2Col<0)     parent2Col=j;
+        if(h==='דוא"ל אפוטרופוס 1' && email1Col<0)      email1Col=j;
+        if(h==='דוא"ל אפוטרופוס 2' && email2Col<0)      email2Col=j;
+        if(h==='חונך/כת'            && teacherCol<0)     teacherCol=j;
+        if(h==='כיתת אם'            && classLetterCol<0) classLetterCol=j;
+      }
+      break;
+    }
   }
+  if(hdrIdx<0) return [];
 
   const out=[];
   let classLetter='', teacher='';
 
-  for(let i=3;i<rows.length;i++){
+  for(let i=hdrIdx+1;i<rows.length;i++){
     const row=rows[i]; if(!row) continue;
     const first=firstCol>=0?norm(row[firstCol]):'';
     const last =lastCol >=0?norm(row[lastCol]) :'';
@@ -341,26 +353,54 @@ function parseTypeA(ws){
       break;
     }
   }
-  const hdrRow  =rows[7]||[];
-  const levelRow=rows[8]||[];
+  // Find header row (contains "שאלה N") anywhere in the sheet
+  const ALL_LEVELS=new Set([...Q_LEVELS, SKIP_LEVEL]);
+  let hdrRowIdx=-1, levelRowIdx=-1;
   const qCols=[];
-  for(let j=7;j<hdrRow.length;j++){
-    const m=norm(hdrRow[j]).match(/^שאלה\s*(\d+)$/);
-    if(!m) continue;
-    const num  =parseInt(m[1]);
-    const lvRaw=norm(levelRow[j]);
-    const level=lvRaw===SKIP_LEVEL?SKIP_LEVEL:Q_LEVELS.includes(lvRaw)?lvRaw:'הבנה בסיסית';
-    qCols.push({idx:j,num,level});
+
+  for(let i=0;i<rows.length;i++){
+    const row=rows[i]||[];
+    const rs=row.map(c=>norm(c));
+    if(rs.some(c=>/^שאלה\s*\d+$/.test(c))){
+      hdrRowIdx=i;
+      for(let j=0;j<rs.length;j++){
+        const m=rs[j].match(/^שאלה\s*(\d+)$/);
+        if(m) qCols.push({idx:j,num:parseInt(m[1]),level:'הבנה בסיסית'});
+      }
+      break;
+    }
   }
+
+  // Find any row (before or after header) that contains level labels
+  if(hdrRowIdx>=0){
+    for(let i=0;i<rows.length;i++){
+      if(i===hdrRowIdx) continue;
+      const row=rows[i]||[];
+      const rs=row.map(c=>norm(c));
+      if(rs.some(c=>ALL_LEVELS.has(c))){
+        levelRowIdx=i;
+        // assign levels to qCols by column index
+        for(const qc of qCols){
+          const lv=rs[qc.idx]||'';
+          if(ALL_LEVELS.has(lv)) qc.level=lv;
+        }
+        break;
+      }
+    }
+  }
+
   const totalQ   =qCols.length?Math.max(...qCols.map(q=>q.num)):0;
   const questions=qCols.map(q=>({num:q.num,level:q.level}));
-  const hasLevels=questions.some(q=>q.level!=='הבנה בסיסית');
+  const hasLevels=questions.some(q=>q.level!=='הבנה בסיסית'&&q.level!==SKIP_LEVEL);
   const SKIP=['ממוצע','סה"כ','סהכ','כיתה'];
   const students={};
-  for(let i=10;i<rows.length;i++){
+  const dataStart=hdrRowIdx>=0?hdrRowIdx+1:10;
+  for(let i=dataStart;i<rows.length;i++){
     const row=rows[i]; if(!row) continue;
     const rawName=norm(row[0]); if(!rawName) continue;
     if(SKIP.some(w=>rawName.includes(w))) continue;
+    // skip the level row itself if it appears after the header
+    if(levelRowIdx>=0&&i===levelRowIdx) continue;
     const status=norm(row[2]);
     if(status==='טרם הותחלה'){
       const arr=new Array(totalQ).fill(null); arr._notStarted=true; students[rawName]=arr; continue;
