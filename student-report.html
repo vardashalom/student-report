@@ -191,6 +191,13 @@ const SCORE_LABELS={excellent:'מצוין',good:'טוב מאוד',basic:'טוב'
 const SCORE_COLORS={excellent:'#27ae60',good:'#2980b9',basic:'#16a085',struggle:'#e67e22',far:'#e74c3c',notdone:'#95a5a6'};
 const Q_LEVELS=['הבנה בסיסית','שאלה מילולית','תובנה גבוהה'];
 const SKIP_LEVEL='דלג';
+// aliases → canonical level name
+const LEVEL_ALIASES={'ידע בסיסי':'הבנה בסיסית','תובנה בסיסית':'הבנה בסיסית',
+                     'הבנה בסיסית':'הבנה בסיסית','שאלה מילולית':'שאלה מילולית','תובנה גבוהה':'תובנה גבוהה'};
+function canonicalLevel(raw){
+  if(raw===SKIP_LEVEL) return SKIP_LEVEL;
+  return LEVEL_ALIASES[raw]||null; // null = not a known level
+}
 
 // ══════════════════════ UTILS ══════════════════════
 const norm   = s => String(s??'').trim().replace(/\s+/g,' ');
@@ -377,12 +384,12 @@ function parseTypeA(ws){
       if(i===hdrRowIdx) continue;
       const row=rows[i]||[];
       const rs=row.map(c=>norm(c));
-      if(rs.some(c=>ALL_LEVELS.has(c))){
+      if(rs.some(c=>canonicalLevel(c)!==null||c===SKIP_LEVEL)){
         levelRowIdx=i;
-        // assign levels to qCols by column index
         for(const qc of qCols){
           const lv=rs[qc.idx]||'';
-          if(ALL_LEVELS.has(lv)) qc.level=lv;
+          const cl=canonicalLevel(lv);
+          if(cl!==null) qc.level=cl;
         }
         break;
       }
@@ -447,8 +454,25 @@ function parseTypeB(ws,fileName){
 function mergeTasks(a,b){
   const totalQ=Math.max(a.totalQ,b.totalQ);
   const qMap={};
-  for(const q of a.questions) qMap[q.num]=q;
-  for(const q of b.questions) qMap[q.num]=q;
+  for(const q of a.questions) qMap[q.num]={...q};
+  for(const q of b.questions){
+    if(!qMap[q.num]){ qMap[q.num]={...q}; }
+    else{
+      // prefer non-default, non-skip level
+      const curLv=qMap[q.num].level, newLv=q.level;
+      const curDefault=curLv==='הבנה בסיסית'||curLv===SKIP_LEVEL;
+      const newBetter =newLv!=='הבנה בסיסית'&&newLv!==SKIP_LEVEL;
+      if(curDefault&&newBetter) qMap[q.num].level=newLv;
+      // if a has levels and b doesn't, keep a's; if b has levels copy to a
+    }
+  }
+  // propagate levels: if one file had level info, apply to all questions
+  const hasALevels=a.hasLevels, hasBLevels=b.hasLevels;
+  if(hasALevels&&!hasBLevels){
+    // keep a's levels (already in qMap from a)
+  } else if(!hasALevels&&hasBLevels){
+    // b's levels are already merged above
+  }
   const questions=Object.values(qMap).sort((x,y)=>x.num-y.num);
   const students={};
   const pad=(sc,n)=>{const a=[...sc];while(a.length<n)a.push(null);return a;};
@@ -649,9 +673,16 @@ function renderTab2(){
       const showLevels=task.hasLevels&&activeLevels.length>1;
       const scores=getScores(task,student);
       const stats =computeStats(scores,task.questions,task.totalQ);
+      // question numbers labeled הבנה בסיסית
+      const basicQNums=task.questions.filter(q=>q.level==='הבנה בסיסית').map(q=>q.num);
+      const basicQLine=basicQNums.length
+        ?`<div style="font-size:.72rem;color:#888;margin-bottom:5px">שאלות הבנה בסיסית: ${basicQNums.join(', ')}</div>`
+        :'';
+
       if(!stats||stats.notStarted){
         tasksHtml+=`<div class="card-task-block">
           <div class="card-task-name">${esc(taskName)}</div>
+          ${basicQLine}
           <span class="notstarted-text">${female?'טרם עשתה':'טרם עשה'}</span>
         </div>`;
         continue;
@@ -678,6 +709,7 @@ function renderTab2(){
       }
       tasksHtml+=`<div class="card-task-block done">
         <div class="card-task-name">${esc(taskName)}</div>
+        ${basicQLine}
         <div class="card-task-avg" style="color:${lvColor}">${stats.avg??'—'}</div>
         <div class="card-avg-basis">מבוסס על ${stats.solvedCount} מתוך ${task.totalQ} שאלות</div>
         ${levelsHtml}
